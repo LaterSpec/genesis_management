@@ -1,0 +1,82 @@
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap");
+@import "tailwindcss";
+@source "../**/*.{js,ts,jsx,tsx,mdx,html}";
+
+@layer base {
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined' !important;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+  }
+}
+@theme {
+  --color-primary: #006c49;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #10b981;
+  --color-on-primary-container: #00422b;
+  
+  --color-secondary: #575e70;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d9dff5;
+  --color-on-secondary-container: #5c6274;
+  
+  --color-tertiary: #006c4b;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #00b982;
+  --color-on-tertiary-container: #00422c;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  
+  --color-surface: #f9f9ff;
+  --color-on-surface: #141b2b;
+  --color-surface-variant: #dce2f7;
+  --color-on-surface-variant: #3c4a42;
+  
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f1f3ff;
+  --color-surface-container: #e9edff;
+  --color-surface-container-high: #e1e8fd;
+  --color-surface-container-highest: #dce2f7;
+
+  --color-outline: #6c7a71;
+  --color-outline-variant: #bbcabf;
+
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+@utility bg-gradient-cta {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container));
+}
+
+@utility glass-panel {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+}
+
+@utility gradient-text {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headline);
+}

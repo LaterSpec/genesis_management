@@ -1,0 +1,110 @@
+Project GenesisGym {
+  database_type: 'PostgreSQL'
+  Note: 'GenesisGym Management System'
+}
+
+Enum role_enum {
+  administrator
+  receptionist
+}
+
+Enum membership_status {
+  active
+  expired
+  cancelled
+}
+
+Table profiles {
+  id uuid [pk, note: 'References auth.users']
+  first_name varchar
+  last_name varchar
+  role role_enum
+  created_at timestamptz
+}
+
+Table clients {
+  id uuid [pk, default: `gen_random_uuid()`]
+  first_name varchar
+  last_name varchar
+  email varchar [unique]
+  status varchar [default: 'active']
+  join_date timestamptz [default: `now()`]
+}
+
+Table membership_plans {
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar
+  description text
+  price numeric
+  duration_days integer
+}
+
+Table memberships {
+  id uuid [pk, default: `gen_random_uuid()`]
+  client_id uuid [ref: > clients.id]
+  plan_id uuid [ref: > membership_plans.id]
+  start_date timestamptz
+  end_date timestamptz
+  status membership_status
+  created_at timestamptz [default: `now()`]
+}
+
+Table categories {
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar
+}
+
+Table products {
+  id uuid [pk, default: `gen_random_uuid()`]
+  sku varchar [unique]
+  name varchar
+  category_id uuid [ref: > categories.id]
+  price numeric
+  stock integer [default: 0]
+  image_url varchar [null]
+}
+
+Table sales {
+  id uuid [pk, default: `gen_random_uuid()`]
+  client_id uuid [null, ref: > clients.id]
+  total numeric [default: 0]
+  created_at timestamptz [default: `now()`]
+  status varchar [default: 'completed']
+  seller_id uuid [ref: > profiles.id]
+}
+
+Table sale_items {
+  id uuid [pk, default: `gen_random_uuid()`]
+  sale_id uuid [ref: > sales.id]
+  product_id uuid [null, ref: > products.id]
+  membership_id uuid [null, ref: > memberships.id]
+  quantity integer
+  unit_price numeric
+}
+
+Table financial_transactions {
+  id uuid [pk, default: `gen_random_uuid()`]
+  type varchar [note: 'income, expense']
+  amount numeric
+  description text
+  date timestamptz [default: `now()`]
+  category varchar
+  sale_id uuid [null, ref: - sales.id]
+}
+
+Table client_credits {
+  id uuid [pk, default: `gen_random_uuid()`]
+  client_id uuid [unique, ref: - clients.id]
+  balance numeric [default: 0, note: 'Deuda actual del cliente']
+  last_updated timestamptz [default: `now()`]
+}
+
+Table activity_logs {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [null, ref: > profiles.id]
+  client_id uuid [null, ref: > clients.id]
+  action_type varchar
+  description text
+  is_error boolean [default: false]
+  created_at timestamptz [default: `now()`]
+}
