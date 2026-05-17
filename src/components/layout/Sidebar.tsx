@@ -2,16 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logout } from "@/app/login/actions";
 
 const navItems = [
   { name: "Dashboard", href: "/pages/dashboard", icon: "dashboard" },
   { name: "Clientes", href: "/pages/clients", icon: "group" },
   { name: "Inventario", href: "/pages/inventory", icon: "inventory_2" },
+  { name: "Membresías", href: "/pages/memberships", icon: "card_membership" },
   { name: "Ventas", href: "/pages/sales", icon: "payments" },
   { name: "Finanzas", href: "/pages/finances", icon: "account_balance" },
   { name: "Créditos", href: "/pages/credits", icon: "credit_card" },
   { name: "Ver Registro", href: "/pages/activity_log", icon: "history" },
 ];
+
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -58,10 +61,12 @@ export default function Sidebar() {
       </div>
 
       <div className="p-6 mt-auto">
-        <button className="text-on-surface/60 flex items-center gap-4 hover:text-error transition-colors w-full text-left">
-          <span className="material-symbols-outlined">logout</span>
-          Cerrar Sesión
-        </button>
+        <form action={logout}>
+          <button type="submit" className="text-on-surface/60 flex items-center gap-4 hover:text-error transition-colors w-full text-left cursor-pointer">
+            <span className="material-symbols-outlined">logout</span>
+            Cerrar Sesión
+          </button>
+        </form>
       </div>
     </nav>
   );

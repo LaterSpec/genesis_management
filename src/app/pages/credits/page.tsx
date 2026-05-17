@@ -29,7 +29,7 @@ export default async function CreditsPage() {
       {/* Bento Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
         {/* Major Metric */}
-        <div className="col-span-1 md:col-span-8 bg-surface-container-lowest rounded-3xl p-8 relative overflow-hidden flex flex-col justify-between min-h-[220px] shadow-sm border border-outline-variant/10 group">
+        <div className="col-span-1 md:col-span-8 bg-surface-container-low rounded-3xl p-8 relative overflow-hidden flex flex-col justify-between min-h-[220px] shadow-sm border border-outline-variant/10 group">
           <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-primary-container/10 rounded-full blur-3xl pointer-events-none transition-transform group-hover:scale-110 duration-700"></div>
           <div className="flex justify-between items-start relative z-10">
             <div>
@@ -76,7 +76,7 @@ export default async function CreditsPage() {
       </div>
 
       {/* Interactive List Container */}
-      <div className="bg-surface-container-lowest rounded-[2.5rem] p-4 shadow-sm border border-outline-variant/10 relative z-10">
+      <div className="bg-surface-container-low rounded-[2.5rem] p-4 shadow-sm border border-outline-variant/10 relative z-10">
         <div className="px-8 py-8 flex justify-between items-center">
           <h3 className="font-headline text-2xl font-bold text-on-surface">Estado de Cuentas</h3>
           <div className="flex gap-3">

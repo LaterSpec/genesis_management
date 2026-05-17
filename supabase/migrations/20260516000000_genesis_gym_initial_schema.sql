@@ -14,6 +14,9 @@ CREATE TABLE profiles (
   first_name TEXT NOT NULL,
   last_name TEXT NOT NULL,
   role role_enum NOT NULL DEFAULT 'receptionist',
+  birth_date DATE,
+  registration_date TIMESTAMPTZ,
+  gender TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

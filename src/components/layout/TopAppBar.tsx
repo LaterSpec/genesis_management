@@ -1,3 +1,5 @@
+import { ThemeToggle } from "@/components/ThemeToggle";
+
 export default function TopAppBar() {
   return (
     <header className="sticky top-0 z-40 bg-surface/80 backdrop-blur-xl w-full flex justify-between items-center px-8 py-4 border-b border-outline-variant/20">
@@ -16,6 +18,7 @@ export default function TopAppBar() {
       </div>
       
       <div className="flex items-center gap-4">
+        <ThemeToggle />
         <button className="p-2 text-on-surface/70 hover:bg-primary-container/10 hover:text-primary rounded-full transition-colors duration-200 cursor-pointer flex items-center justify-center">
           <span className="material-symbols-outlined">notifications</span>
         </button>

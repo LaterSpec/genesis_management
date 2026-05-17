@@ -46,7 +46,7 @@ export default async function FinancesPage() {
       {/* Top Level Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
         {/* Total Ingresos */}
-        <div className="bg-surface-container-lowest rounded-[2rem] p-8 flex flex-col justify-between relative overflow-hidden group shadow-sm border border-outline-variant/10">
+        <div className="bg-surface-container-low rounded-[2rem] p-8 flex flex-col justify-between relative overflow-hidden group shadow-sm border border-outline-variant/10">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary-container/10 rounded-full blur-2xl -mr-10 -mt-10 transition-transform group-hover:scale-110 duration-500"></div>
           <div className="flex items-center justify-between mb-8 relative z-10">
             <span className="font-body text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">
@@ -66,7 +66,7 @@ export default async function FinancesPage() {
         </div>
 
         {/* Total Egresos */}
-        <div className="bg-surface-container-lowest rounded-[2rem] p-8 flex flex-col justify-between relative overflow-hidden group shadow-sm border border-outline-variant/10">
+        <div className="bg-surface-container-low rounded-[2rem] p-8 flex flex-col justify-between relative overflow-hidden group shadow-sm border border-outline-variant/10">
           <div className="absolute top-0 right-0 w-32 h-32 bg-error-container/20 rounded-full blur-2xl -mr-10 -mt-10 transition-transform group-hover:scale-110 duration-500"></div>
           <div className="flex items-center justify-between mb-8 relative z-10">
             <span className="font-body text-[11px] uppercase tracking-widest text-on-surface-variant font-semibold">
@@ -110,7 +110,7 @@ export default async function FinancesPage() {
       </div>
 
       {/* Chart Section */}
-      <div className="bg-surface-container-lowest rounded-[2.5rem] p-10 shadow-sm border border-outline-variant/10 mb-12">
+      <div className="bg-surface-container-low rounded-[2.5rem] p-10 shadow-sm border border-outline-variant/10 mb-12">
         <div className="flex items-center justify-between mb-10">
           <h3 className="font-headline font-bold text-2xl text-on-surface">Ingresos vs Egresos</h3>
           <div className="flex gap-6">
@@ -162,7 +162,7 @@ export default async function FinancesPage() {
       </div>
 
       {/* Recent Transactions List */}
-      <div className="bg-surface-container-lowest rounded-[2.5rem] p-10 shadow-sm border border-outline-variant/10">
+      <div className="bg-surface-container-low rounded-[2.5rem] p-10 shadow-sm border border-outline-variant/10">
         <div className="flex items-center justify-between mb-10">
           <h3 className="font-headline font-bold text-2xl text-on-surface">
             Transacciones Recientes

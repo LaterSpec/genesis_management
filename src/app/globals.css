@@ -80,3 +80,41 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-headline);
 }
+
+@layer base {
+  .dark {
+    --color-primary: #34d399; /* lighter green */
+    --color-on-primary: #003824;
+    --color-primary-container: #005236;
+    --color-on-primary-container: #6ee7b7;
+    
+    --color-secondary: #b0b7c9;
+    --color-on-secondary: #1a2233;
+    --color-secondary-container: #33394a;
+    --color-on-secondary-container: #cdd4e6;
+    
+    --color-tertiary: #34d399;
+    --color-on-tertiary: #003824;
+    --color-tertiary-container: #005236;
+    --color-on-tertiary-container: #6ee7b7;
+
+    --color-error: #ffb4ab;
+    --color-on-error: #690005;
+    --color-error-container: #93000a;
+    --color-on-error-container: #ffdad6;
+    
+    --color-surface: #0f141f; /* dark gray blue */
+    --color-on-surface: #e2e8f0; /* light text */
+    --color-surface-variant: #333d4b;
+    --color-on-surface-variant: #cbd5e1;
+    
+    --color-surface-container-lowest: #080a0f;
+    --color-surface-container-low: #131926;
+    --color-surface-container: #192131;
+    --color-surface-container-high: #202a3d;
+    --color-surface-container-highest: #2b364d;
+
+    --color-outline: #8c9b92;
+    --color-outline-variant: #3f4c45;
+  }
+}

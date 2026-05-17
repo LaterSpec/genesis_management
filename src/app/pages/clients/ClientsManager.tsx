@@ -107,7 +107,7 @@ function ClientDrawer({ isOpen, editingClient, onClose, onSaved }: DrawerProps) 
 
       {/* Panel */}
       <div
-        className="relative w-full max-w-md bg-surface-container-lowest h-full shadow-2xl flex flex-col"
+        className="relative w-full max-w-md bg-surface-container-low h-full shadow-2xl flex flex-col"
         style={{
           transform: animating ? "translateX(0)" : "translateX(100%)",
           transition: "transform 300ms cubic-bezier(0.4, 0, 0.2, 1)",
@@ -330,15 +330,15 @@ export default function ClientsManager({
 
       {/* Stats / Filter */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow">
           <p className="text-[11px] uppercase tracking-[0.05em] text-on-surface/50 font-bold mb-1">Total Activos</p>
           <span className="font-headline text-4xl font-extrabold text-on-surface">{stats.totalActive}</span>
         </div>
-        <div className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/10 shadow-sm hover:shadow-md transition-shadow">
           <p className="text-[11px] uppercase tracking-[0.05em] text-on-surface/50 font-bold mb-1">Nuevos este mes</p>
           <span className="font-headline text-4xl font-extrabold text-on-surface">{stats.newThisMonth}</span>
         </div>
-        <div className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/10 shadow-sm flex flex-col justify-center">
+        <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/10 shadow-sm flex flex-col justify-center">
           <div className="relative w-full">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface/40 pointer-events-none">
               filter_list
@@ -357,7 +357,7 @@ export default function ClientsManager({
       </div>
 
       {/* Table */}
-      <div className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm border border-outline-variant/10">
+      <div className="bg-surface-container-low rounded-2xl overflow-hidden shadow-sm border border-outline-variant/10">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>

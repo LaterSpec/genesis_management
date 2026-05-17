@@ -9,6 +9,7 @@
 export type RoleEnum = "administrator" | "receptionist";
 export type MembershipStatus = "active" | "expired" | "cancelled";
 export type TransactionType = "income" | "expense";
+export type PaymentMethod = "efectivo" | "tarjeta" | "yape";
 
 // ─── Tablas ────────────────────────────────────────────────────────────────────
 
@@ -76,6 +77,7 @@ export interface Sale {
   created_at: string;
   status: string;
   seller_id: string | null;
+  payment_method: PaymentMethod;
   // Relaciones opcionales
   clients?: Client;
   profiles?: Profile;
@@ -87,11 +89,13 @@ export interface SaleItem {
   sale_id: string;
   product_id: string | null;
   membership_id: string | null;
+  plan_id: string | null;
   quantity: number;
   unit_price: number;
   // Relaciones opcionales
   products?: Product;
   memberships?: Membership;
+  membership_plans?: MembershipPlan;
 }
 
 export interface FinancialTransaction {
@@ -163,12 +167,12 @@ export interface Database {
       };
       sales: {
         Row: Sale;
-        Insert: Omit<Sale, "id" | "created_at"> & { id?: string; created_at?: string };
+        Insert: Omit<Sale, "id" | "created_at"> & { id?: string; created_at?: string; payment_method?: PaymentMethod };
         Update: Partial<Omit<Sale, "id">>;
       };
       sale_items: {
         Row: SaleItem;
-        Insert: Omit<SaleItem, "id"> & { id?: string };
+        Insert: Omit<SaleItem, "id"> & { id?: string; plan_id?: string | null };
         Update: Partial<Omit<SaleItem, "id">>;
       };
       financial_transactions: {

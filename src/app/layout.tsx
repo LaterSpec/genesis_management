@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/layout/Sidebar";
-import TopAppBar from "@/components/layout/TopAppBar";
+import AppLayout from "@/components/layout/AppLayout";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -25,18 +25,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${manrope.variable}`}>
+    <html lang="es" className={`${inter.variable} ${manrope.variable}`} suppressHydrationWarning>
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
       <body className="antialiased bg-surface text-on-surface flex min-h-screen">
-        <Sidebar />
-        <main className="flex-1 md:ml-72 flex flex-col min-h-screen relative">
-          <TopAppBar />
-          <div className="p-8 space-y-8 flex-1 overflow-x-hidden">
-            {children}
-          </div>
-        </main>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AppLayout>{children}</AppLayout>
+        </ThemeProvider>
       </body>
     </html>
   );

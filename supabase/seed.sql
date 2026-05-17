@@ -7,17 +7,60 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- ─── AUTH USERS & PROFILES ────────────────────────────────────────────────────
 -- Insertar usuarios en auth.users (mockeando auth para desarrollo)
 -- Administrador:
-INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at)
+INSERT INTO auth.users (
+  id, instance_id, aud, role, email,
+  encrypted_password, email_confirmed_at,
+  confirmation_token, recovery_token,
+  email_change_token_new, email_change_token_current,
+  email_change, reauthentication_token, phone_change_token,
+  raw_app_meta_data, raw_user_meta_data,
+  created_at, updated_at
+)
 VALUES 
-  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'admin@genesisgym.com', crypt('admin123', gen_salt('bf')), NOW(), NOW(), NOW()),
-  ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'reception@genesisgym.com', crypt('reception123', gen_salt('bf')), NOW(), NOW(), NOW())
-ON CONFLICT (id) DO NOTHING;
+  (
+    '00000000-0000-0000-0000-000000000001',
+    '00000000-0000-0000-0000-000000000000',
+    'authenticated', 'authenticated',
+    'admin@genesisgym.com',
+    crypt('admin123', gen_salt('bf')),
+    NOW(),
+    '', '', '', '', '', '', '',
+    '{"provider":"email","providers":["email"]}', '{}',
+    NOW(), NOW()
+  ),
+  (
+    '00000000-0000-0000-0000-000000000002',
+    '00000000-0000-0000-0000-000000000000',
+    'authenticated', 'authenticated',
+    'reception@genesisgym.com',
+    crypt('admin123', gen_salt('bf')),
+    NOW(),
+    '', '', '', '', '', '', '',
+    '{"provider":"email","providers":["email"]}', '{}',
+    NOW(), NOW()
+  )
+ON CONFLICT (id) DO UPDATE SET
+  confirmation_token = '',
+  recovery_token = '',
+  email_change_token_new = '',
+  email_change_token_current = '',
+  email_change = '',
+  reauthentication_token = '',
+  phone_change_token = '';
+
+
+-- Insertar identidades de auth
+INSERT INTO auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+VALUES
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', format('{"sub":"%s","email":"%s"}', '00000000-0000-0000-0000-000000000001', 'admin@genesisgym.com')::jsonb, 'email', NOW(), NOW(), NOW()),
+  ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000002', format('{"sub":"%s","email":"%s"}', '00000000-0000-0000-0000-000000000002', 'reception@genesisgym.com')::jsonb, 'email', NOW(), NOW(), NOW())
+ON CONFLICT (provider_id, provider) DO NOTHING;
 
 -- Insertar sus correspondientes profiles
-INSERT INTO profiles (id, first_name, last_name, role, created_at)
+INSERT INTO profiles (id, first_name, last_name, role, birth_date, registration_date, gender, created_at)
 VALUES
-  ('00000000-0000-0000-0000-000000000001', 'Admin', 'Principal', 'administrator', NOW()),
-  ('00000000-0000-0000-0000-000000000002', 'Juan', 'Pérez', 'receptionist', NOW())
+  ('00000000-0000-0000-0000-000000000001', 'Admin', 'Principal', 'administrator', '1980-01-01', NOW(), 'masculino', NOW()),
+  ('00000000-0000-0000-0000-000000000002', 'Juan', 'Pérez', 'receptionist', '1995-05-15', NOW(), 'masculino', NOW())
 ON CONFLICT (id) DO NOTHING;
 
 -- ─── PLANS ────────────────────────────────────────────────────────────────────

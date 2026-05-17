@@ -8,6 +8,9 @@ import { getDailyFinancialData } from "@/lib/api/finances.api";
 import type { ActivityLogFull } from "@/lib/api/logs.api";
 
 // ─── Server Component (async) ─────────────────────────────────────────────────
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function DashboardPage() {
   const [clientStats, inventoryStats, monthlySales, creditTotal, recentLogs, weeklyData] =
     await Promise.all([
@@ -47,7 +50,7 @@ export default async function DashboardPage() {
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Total Clientes */}
-        <div className="bg-surface-container-lowest p-6 rounded-2xl relative overflow-hidden group shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow">
+        <div className="bg-surface-container-low p-6 rounded-2xl relative overflow-hidden group shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow">
           <div className="absolute top-0 right-0 w-24 h-24 bg-primary-container/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
           <div className="flex justify-between items-start mb-6 relative z-10">
             <p className="font-body text-xs font-semibold text-secondary uppercase tracking-widest">
@@ -69,7 +72,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Ventas del Mes */}
-        <div className="bg-surface-container-lowest p-6 rounded-2xl relative overflow-hidden group shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow">
+        <div className="bg-surface-container-low p-6 rounded-2xl relative overflow-hidden group shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow">
           <div className="absolute top-0 right-0 w-24 h-24 bg-primary-container/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
           <div className="flex justify-between items-start mb-6 relative z-10">
             <p className="font-body text-xs font-semibold text-secondary uppercase tracking-widest">
@@ -91,7 +94,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Créditos Pendientes */}
-        <div className="bg-surface-container-lowest p-6 rounded-2xl relative overflow-hidden group shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow">
+        <div className="bg-surface-container-low p-6 rounded-2xl relative overflow-hidden group shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow">
           <div className="absolute top-0 right-0 w-24 h-24 bg-error-container/20 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
           <div className="flex justify-between items-start mb-6 relative z-10">
             <p className="font-body text-xs font-semibold text-secondary uppercase tracking-widest">
@@ -110,7 +113,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Bajo Stock */}
-        <div className="bg-surface-container-lowest p-6 rounded-2xl relative overflow-hidden group shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow">
+        <div className="bg-surface-container-low p-6 rounded-2xl relative overflow-hidden group shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow">
           <div className="absolute top-0 right-0 w-24 h-24 bg-tertiary-container/20 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
           <div className="flex justify-between items-start mb-6 relative z-10">
             <p className="font-body text-xs font-semibold text-secondary uppercase tracking-widest">
@@ -132,7 +135,7 @@ export default async function DashboardPage() {
       {/* Layout Grid: Charts and Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Chart Area */}
-        <div className="lg:col-span-2 bg-surface-container-lowest rounded-2xl p-8 relative shadow-sm border border-outline-variant/10">
+        <div className="lg:col-span-2 bg-surface-container-low rounded-2xl p-8 relative shadow-sm border border-outline-variant/10">
           <div className="flex justify-between items-center mb-8">
             <div>
               <h3 className="font-headline font-bold text-xl text-on-surface">

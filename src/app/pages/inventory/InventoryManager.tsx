@@ -106,7 +106,7 @@ function ProductDrawer({ isOpen, editingProduct, categories, onClose, onSaved }:
 
       {/* Panel */}
       <div
-        className="relative w-full max-w-md bg-surface-container-lowest h-full shadow-2xl flex flex-col"
+        className="relative w-full max-w-md bg-surface-container-low h-full shadow-2xl flex flex-col"
         style={{
           transform: animating ? "translateX(0)" : "translateX(100%)",
           transition: "transform 300ms cubic-bezier(0.4, 0, 0.2, 1)",
@@ -309,7 +309,7 @@ function QuickStockPanel({ products }: { products: ProductWithCategory[] }) {
   };
 
   return (
-    <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/10">
+    <div className="bg-surface-container-low rounded-2xl p-6 shadow-sm border border-outline-variant/10">
       <h3 className="font-headline font-bold text-lg text-on-surface mb-6 flex items-center gap-2">
         <span className="material-symbols-outlined text-primary">add_box</span>
         Registro Rápido
@@ -343,7 +343,7 @@ function QuickStockPanel({ products }: { products: ProductWithCategory[] }) {
 
             {/* Suggestions dropdown */}
             {showSuggestions && suggestions.length > 0 && (
-              <ul className="absolute z-40 top-full left-0 right-0 mt-1 bg-surface-container-lowest border border-outline-variant/20 rounded-xl shadow-xl overflow-hidden">
+              <ul className="absolute z-40 top-full left-0 right-0 mt-1 bg-surface-container-low border border-outline-variant/20 rounded-xl shadow-xl overflow-hidden">
                 {suggestions.map((p) => {
                   const isLow = p.stock <= 10;
                   return (
@@ -369,7 +369,7 @@ function QuickStockPanel({ products }: { products: ProductWithCategory[] }) {
 
             {/* No results */}
             {showSuggestions && query.length >= 1 && suggestions.length === 0 && (
-              <div className="absolute z-40 top-full left-0 right-0 mt-1 bg-surface-container-lowest border border-outline-variant/20 rounded-xl shadow-xl px-4 py-3">
+              <div className="absolute z-40 top-full left-0 right-0 mt-1 bg-surface-container-low border border-outline-variant/20 rounded-xl shadow-xl px-4 py-3">
                 <p className="text-xs text-on-surface/50">Sin resultados para &ldquo;{query}&rdquo;</p>
               </div>
             )}
@@ -492,7 +492,7 @@ export default function InventoryManager({
           { icon: "warning", color: "text-error", bg: "bg-error-container/40", label: "Stock Crítico", value: stats.criticalStock },
           { icon: "category", color: "text-tertiary", bg: "bg-tertiary-container/20", label: "Categorías", value: stats.totalCategories },
         ].map(({ icon, color, bg, label, value }) => (
-          <div key={label} className="bg-surface-container-lowest rounded-2xl p-6 relative overflow-hidden group shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow">
+          <div key={label} className="bg-surface-container-low rounded-2xl p-6 relative overflow-hidden group shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow">
             <div className={`absolute top-0 right-0 w-32 h-32 ${bg} rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110`} />
             <span className={`material-symbols-outlined ${color} mb-4 block text-3xl relative z-10`}>{icon}</span>
             <h3 className="font-body text-sm text-on-surface-variant mb-1 relative z-10">{label}</h3>
@@ -531,7 +531,7 @@ export default function InventoryManager({
             </div>
           </div>
 
-          <div className="bg-surface-container-lowest rounded-2xl p-2 shadow-sm border border-outline-variant/10 max-h-[600px] overflow-y-auto">
+          <div className="bg-surface-container-low rounded-2xl p-2 shadow-sm border border-outline-variant/10 max-h-[600px] overflow-y-auto">
             {filteredProducts.length === 0 ? (
               <p className="py-12 text-center text-on-surface/40 font-body text-sm">
                 No hay productos en esta categoría.

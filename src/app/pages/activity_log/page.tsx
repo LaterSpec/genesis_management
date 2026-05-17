@@ -28,7 +28,7 @@ export default async function ActivityLogPage() {
 
       {/* Filters & Controls */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-10">
-        <div className="md:col-span-5 bg-surface-container-lowest rounded-[2rem] p-6 border border-outline-variant/10 shadow-sm">
+        <div className="md:col-span-5 bg-surface-container-low rounded-[2rem] p-6 border border-outline-variant/10 shadow-sm">
           <label className="text-xs font-label text-secondary font-bold uppercase tracking-wider mb-4 block">
             Rango de Fechas
           </label>
@@ -38,7 +38,7 @@ export default async function ActivityLogPage() {
                 calendar_today
               </span>
               <input
-                className="w-full pl-10 pr-4 py-2.5 bg-surface-container-low text-sm font-body border border-transparent focus:border-primary focus:bg-surface-container-lowest focus:outline-none transition-all rounded-xl text-on-surface"
+                className="w-full pl-10 pr-4 py-2.5 bg-surface-container-low text-sm font-body border border-transparent focus:border-primary focus:bg-surface-container-low focus:outline-none transition-all rounded-xl text-on-surface"
                 type="date"
                 defaultValue={new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)}
               />
@@ -49,7 +49,7 @@ export default async function ActivityLogPage() {
                 calendar_today
               </span>
               <input
-                className="w-full pl-10 pr-4 py-2.5 bg-surface-container-low text-sm font-body border border-transparent focus:border-primary focus:bg-surface-container-lowest focus:outline-none transition-all rounded-xl text-on-surface"
+                className="w-full pl-10 pr-4 py-2.5 bg-surface-container-low text-sm font-body border border-transparent focus:border-primary focus:bg-surface-container-low focus:outline-none transition-all rounded-xl text-on-surface"
                 type="date"
                 defaultValue={new Date().toISOString().slice(0, 10)}
               />
@@ -57,7 +57,7 @@ export default async function ActivityLogPage() {
           </div>
         </div>
 
-        <div className="md:col-span-7 bg-surface-container-lowest rounded-[2rem] p-6 border border-outline-variant/10 shadow-sm flex flex-col justify-center">
+        <div className="md:col-span-7 bg-surface-container-low rounded-[2rem] p-6 border border-outline-variant/10 shadow-sm flex flex-col justify-center">
           <label className="text-xs font-label text-secondary font-bold uppercase tracking-wider mb-4 block">
             Filtrar por Tipo de Acción
           </label>
@@ -72,7 +72,7 @@ export default async function ActivityLogPage() {
       </div>
 
       {/* Data Table Canvas */}
-      <div className="bg-surface-container-lowest rounded-[2.5rem] overflow-hidden border border-outline-variant/10 shadow-sm relative mb-12">
+      <div className="bg-surface-container-low rounded-[2.5rem] overflow-hidden border border-outline-variant/10 shadow-sm relative mb-12">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>

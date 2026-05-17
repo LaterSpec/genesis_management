@@ -30,6 +30,7 @@ export async function getClients(filters?: {
       )
     `
     )
+    .neq("dni", "00000000") // Excluir el cliente comodín Visitante
     .order("join_date", { ascending: false });
 
   if (filters?.status) {
@@ -41,6 +42,30 @@ export async function getClients(filters?: {
   return (data ?? []) as ClientWithMembership[];
 }
 
+/** Devuelve todos los clientes activos (incluyendo Visitante) para el selector del POS. */
+export async function getClientsForPOS(): Promise<Client[]> {
+  const { data, error } = await supabase
+    .from("clients")
+    .select("id, first_name, last_name, dni, email, status, join_date, phone")
+    .eq("status", "active")
+    .order("first_name", { ascending: true });
+
+  if (error) throw new Error(`[clients.api] getClientsForPOS: ${error.message}`);
+  return (data ?? []) as Client[];
+}
+
+/** Obtiene el ID del cliente comodín "Visitante". */
+export async function getVisitorClientId(): Promise<string> {
+  const { data, error } = await supabase
+    .from("clients")
+    .select("id")
+    .eq("dni", "00000000")
+    .single();
+
+  if (error) throw new Error(`[clients.api] getVisitorClientId: ${error.message}`);
+  return (data as { id: string }).id;
+}
+
 /** Cuenta total de clientes activos e incorporaciones del mes actual. */
 export async function getClientStats(): Promise<{
   totalActive: number;
@@ -50,11 +75,12 @@ export async function getClientStats(): Promise<{
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
   const [activeResult, newResult] = await Promise.all([
-    supabase.from("clients").select("id", { count: "exact", head: true }).eq("status", "active"),
+    supabase.from("clients").select("id", { count: "exact", head: true }).eq("status", "active").neq("dni", "00000000"),
     supabase
       .from("clients")
       .select("id", { count: "exact", head: true })
-      .gte("join_date", firstDayOfMonth),
+      .gte("join_date", firstDayOfMonth)
+      .neq("dni", "00000000"),
   ]);
 
   if (activeResult.error) throw new Error(`[clients.api] getClientStats (active): ${activeResult.error.message}`);
@@ -123,7 +149,7 @@ export async function updateClientStatus(id: string, status: string): Promise<vo
   if (error) throw new Error(`[clients.api] updateClientStatus: ${error.message}`);
 }
 
-// ─── Planes de Membresía ───────────────────────────────────────────────────────
+// ─── Planes de Membresía (CRUD Completo) ──────────────────────────────────────
 
 /** Obtiene todos los planes de membresía disponibles. */
 export async function getMembershipPlans(): Promise<MembershipPlan[]> {
@@ -134,6 +160,119 @@ export async function getMembershipPlans(): Promise<MembershipPlan[]> {
 
   if (error) throw new Error(`[clients.api] getMembershipPlans: ${error.message}`);
   return (data ?? []) as MembershipPlan[];
+}
+
+/** Crea un nuevo plan de membresía. */
+export async function createMembershipPlan(
+  input: Pick<MembershipPlan, "name" | "description" | "price" | "duration_days">
+): Promise<MembershipPlan> {
+  const { data, error } = await supabase
+    .from("membership_plans")
+    .insert(input)
+    .select()
+    .single();
+
+  if (error) throw new Error(`[clients.api] createMembershipPlan: ${error.message}`);
+  return data as MembershipPlan;
+}
+
+/** Actualiza un plan de membresía. */
+export async function updateMembershipPlan(
+  id: string,
+  input: Partial<Pick<MembershipPlan, "name" | "description" | "price" | "duration_days">>
+): Promise<MembershipPlan> {
+  const { data, error } = await supabase
+    .from("membership_plans")
+    .update(input)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) throw new Error(`[clients.api] updateMembershipPlan: ${error.message}`);
+  return data as MembershipPlan;
+}
+
+/** Elimina un plan de membresía. */
+export async function deleteMembershipPlan(id: string): Promise<void> {
+  const { error } = await supabase.from("membership_plans").delete().eq("id", id);
+  if (error) throw new Error(`[clients.api] deleteMembershipPlan: ${error.message}`);
+}
+
+// ─── Membresías de Clientes ────────────────────────────────────────────────────
+
+export type MembershipWithRelations = Membership & {
+  clients: Client | null;
+  membership_plans: MembershipPlan | null;
+};
+
+/** Devuelve todas las membresías (de todos los clientes) ordenadas por fecha de fin. */
+export async function getAllMemberships(): Promise<MembershipWithRelations[]> {
+  const { data, error } = await supabase
+    .from("memberships")
+    .select(`*, clients (*), membership_plans (*)`)
+    .order("end_date", { ascending: false });
+
+  if (error) throw new Error(`[clients.api] getAllMemberships: ${error.message}`);
+  return (data ?? []) as MembershipWithRelations[];
+}
+
+/**
+ * Crea una nueva membresía para un cliente con lógica de "plan stacking":
+ * - Si el cliente ya tiene una membresía activa, el nuevo plan inicia
+ *   al terminar el actual (no se pierden días).
+ * - Si no tiene plan activo, inicia hoy.
+ */
+export async function createClientMembership(
+  clientId: string,
+  planId: string,
+  durationDays: number
+): Promise<Membership> {
+  // Buscar membresía activa vigente del cliente
+  const { data: activeMemberships } = await supabase
+    .from("memberships")
+    .select("end_date")
+    .eq("client_id", clientId)
+    .eq("status", "active")
+    .order("end_date", { ascending: false })
+    .limit(1);
+
+  // Si hay una membresía activa, encolar el nuevo plan después de ella
+  const latestEndDate =
+    activeMemberships && activeMemberships.length > 0
+      ? new Date(activeMemberships[0].end_date)
+      : null;
+
+  const startDate = latestEndDate
+    ? new Date(latestEndDate.getTime() + 1000) // 1 segundo después del plan actual
+    : new Date();
+
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + durationDays);
+
+  const { data, error } = await supabase
+    .from("memberships")
+    .insert({
+      client_id: clientId,
+      plan_id: planId,
+      start_date: startDate.toISOString(),
+      end_date: endDate.toISOString(),
+      status: "active",
+    })
+    .select()
+    .single();
+
+  if (error) throw new Error(`[clients.api] createClientMembership: ${error.message}`);
+  return data as Membership;
+}
+
+/** Cancela una membresía activa. */
+export async function cancelMembership(id: string): Promise<void> {
+  const { error } = await supabase
+    .from("memberships")
+    .update({ status: "cancelled" })
+    .eq("id", id);
+
+  if (error) throw new Error(`[clients.api] cancelMembership: ${error.message}`);
 }
 
 // ─── Créditos ──────────────────────────────────────────────────────────────────
