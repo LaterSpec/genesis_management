@@ -1,15 +1,17 @@
 "use client";
 
 import * as React from "react";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/ThemeProvider";
+
+const emptySubscribe = () => () => {};
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
+  const { resolvedTheme, setTheme } = useTheme();
+  const mounted = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   if (!mounted) {
     return (
@@ -21,12 +23,12 @@ export function ThemeToggle() {
 
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
       className="p-2 text-on-surface/70 hover:bg-primary-container/10 hover:text-primary rounded-full transition-colors duration-200 cursor-pointer flex items-center justify-center"
       title="Alternar tema oscuro/claro"
     >
       <span className="material-symbols-outlined">
-        {theme === "dark" ? "light_mode" : "dark_mode"}
+        {resolvedTheme === "dark" ? "light_mode" : "dark_mode"}
       </span>
     </button>
   );

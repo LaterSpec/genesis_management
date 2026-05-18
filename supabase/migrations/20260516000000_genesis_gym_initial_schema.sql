@@ -148,3 +148,4 @@ CREATE POLICY "Allow ALL for anon on sale_items" ON sale_items FOR ALL USING (tr
 CREATE POLICY "Allow ALL for anon on financial_transactions" ON financial_transactions FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow ALL for anon on client_credits" ON client_credits FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow ALL for anon on activity_logs" ON activity_logs FOR ALL USING (true) WITH CHECK (true);
+WA

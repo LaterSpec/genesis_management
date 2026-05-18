@@ -7,6 +7,7 @@ import { logout } from "@/app/login/actions";
 const navItems = [
   { name: "Dashboard", href: "/pages/dashboard", icon: "dashboard" },
   { name: "Clientes", href: "/pages/clients", icon: "group" },
+  { name: "Asistencias", href: "/pages/attendances", icon: "fact_check" },
   { name: "Inventario", href: "/pages/inventory", icon: "inventory_2" },
   { name: "Membresías", href: "/pages/memberships", icon: "card_membership" },
   { name: "Ventas", href: "/pages/sales", icon: "payments" },

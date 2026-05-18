@@ -150,6 +150,9 @@ const ACTION_STYLES: Record<string, { icon: string; className: string; label: st
   MEMBERSHIP_CREATED: { icon: "card_membership", className: "bg-primary-container/20 text-primary",             label: "Membresía" },
   CREDIT_ADDED:       { icon: "credit_card", className: "bg-secondary-container/50 text-on-secondary-container", label: "Crédito" },
   CREDIT_PAID:        { icon: "payments",    className: "bg-primary-container/20 text-primary",                  label: "Pago" },
+  ATTENDANCE_REGISTERED: { icon: "how_to_reg", className: "bg-primary-container/20 text-primary",               label: "Asistencia" },
+  ATTENDANCE_DELETED: { icon: "delete", className: "bg-error-container text-on-error-container",                label: "Eliminación" },
+  ATTENDANCE_WARNING_APPROVED: { icon: "warning", className: "bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200", label: "Aprobación" },
 };
 
 function LogEntry({ log }: { log: ActivityLogFull }) {

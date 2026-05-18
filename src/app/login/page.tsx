@@ -1,8 +1,11 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { login } from "./actions";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const message = searchParams.get("message");
 
   return (
     <div className="flex w-full min-h-screen overflow-hidden bg-surface relative">
@@ -39,6 +42,12 @@ export default function LoginPage() {
               Ingresa tus credenciales para continuar
             </p>
           </div>
+
+          {message ? (
+            <div className="mb-4 rounded-2xl border border-red-300/60 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {message}
+            </div>
+          ) : null}
 
           {/* Form */}
           <form action={login} className="space-y-4">

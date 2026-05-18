@@ -468,7 +468,7 @@ export default function SalesManager({ products, plans, clients, visitorId }: Pr
                 <span className={`w-2 h-2 rounded-full ${isVisitor ? "bg-amber-400" : "bg-primary"}`} />
                 <span className="font-body text-xs text-on-surface/60">
                   {isVisitor
-                    ? "Visitante ocasional"
+                    ? "Visitante"
                     : `${selectedClient?.first_name} ${selectedClient?.last_name} · ${selectedClient?.dni}`}
                 </span>
               </div>
@@ -552,17 +552,12 @@ export default function SalesManager({ products, plans, clients, visitorId }: Pr
                         <span className="font-body text-xs text-on-surface/40 italic">1 plan</span>
                       )}
 
-                      {/* Editable price */}
+                      {/* Fixed price */}
                       <div className="flex items-center gap-1">
                         <span className="font-body text-xs text-on-surface/40">$</span>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={item.unit_price}
-                          onChange={(e) => updatePrice(idx, e.target.value)}
-                          className="w-20 bg-surface-container-high rounded-lg px-2 py-1 text-sm font-bold text-on-surface text-right focus:outline-none focus:ring-2 focus:ring-primary/20"
-                        />
+                        <span className="w-20 bg-surface-container-high rounded-lg px-2 py-1 text-sm font-bold text-on-surface text-right">
+                          {Number(item.unit_price).toFixed(2)}
+                        </span>
                       </div>
                     </div>
 

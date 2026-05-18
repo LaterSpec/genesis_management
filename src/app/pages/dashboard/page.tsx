@@ -224,6 +224,9 @@ function ActivityItem({ log }: { log: ActivityLogFull }) {
     STOCK_ADJUSTMENT: "inventory_2",
     CREDIT_ADDED: "credit_card",
     CREDIT_PAID: "payments",
+    ATTENDANCE_REGISTERED: "how_to_reg",
+    ATTENDANCE_DELETED: "delete",
+    ATTENDANCE_WARNING_APPROVED: "warning",
   };
   const icon = iconMap[log.action_type] ?? "info";
   const time = new Date(log.created_at).toLocaleTimeString("es-MX", {

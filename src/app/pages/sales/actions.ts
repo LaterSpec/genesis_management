@@ -46,9 +46,10 @@ export async function processSaleAction(
     });
 
     // Log the activity
+    const itemNames = items.map(i => `${i.quantity}x ${i.name}`).join(', ');
     await logAction({
       action_type: "SALE_CREATED",
-      description: `Venta #${sale.id.toString().slice(-6).toUpperCase()} — $${Number(sale.total).toFixed(2)} — ${paymentMethod}`,
+      description: `Venta #${sale.id.toString().slice(-6).toUpperCase()} — $${Number(sale.total).toFixed(2)} — ${paymentMethod} — ${itemNames}`,
       user_id: user?.id,
     });
 

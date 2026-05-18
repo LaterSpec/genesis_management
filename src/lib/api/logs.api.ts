@@ -22,7 +22,10 @@ export type LogActionType =
   | "MEMBERSHIP_EXPIRED"
   | "STOCK_ADJUSTMENT"
   | "CREDIT_ADDED"
-  | "CREDIT_PAID";
+  | "CREDIT_PAID"
+  | "ATTENDANCE_REGISTERED"
+  | "ATTENDANCE_DELETED"
+  | "ATTENDANCE_WARNING_APPROVED";
 
 // ─── Consultas ─────────────────────────────────────────────────────────────────
 

@@ -5,6 +5,7 @@ export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
+  const pathname = request.nextUrl.pathname;
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,15 +28,41 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
+  if (pathname.startsWith("/login") || pathname.startsWith("/auth")) {
+    return supabaseResponse;
+  }
+
   // refreshing the auth token
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+
+  try {
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+    user = authUser;
+  } catch (error) {
+    console.error("[SUPABASE AUTH UNAVAILABLE]", {
+      pathname,
+      error,
+    });
+
+    if (pathname.startsWith("/pages")) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set(
+        "message",
+        "No se pudo conectar con el servicio de autenticacion."
+      );
+      return NextResponse.redirect(url);
+    }
+
+    return supabaseResponse;
+  }
 
   if (
     !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
+    !pathname.startsWith("/login") &&
+    !pathname.startsWith("/auth")
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
@@ -45,7 +72,7 @@ export async function updateSession(request: NextRequest) {
 
   if (
     user &&
-    (request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/")
+    (pathname === "/login" || pathname === "/")
   ) {
     const url = request.nextUrl.clone();
     url.pathname = "/pages/dashboard";

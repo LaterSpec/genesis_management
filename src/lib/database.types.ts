@@ -130,6 +130,17 @@ export interface ActivityLog {
   clients?: Client;
 }
 
+export interface ClientAttendance {
+  id: string;
+  client_id: string;
+  registered_by: string | null;
+  attendance_at: string;
+  attendance_date: string;
+  created_at: string;
+  clients?: Client;
+  profiles?: Profile;
+}
+
 // ─── Tipo Database para el cliente Supabase ───────────────────────────────────
 
 export interface Database {
@@ -189,6 +200,11 @@ export interface Database {
         Row: ActivityLog;
         Insert: Omit<ActivityLog, "id" | "created_at"> & { id?: string; created_at?: string };
         Update: Partial<Omit<ActivityLog, "id">>;
+      };
+      client_attendances: {
+        Row: ClientAttendance;
+        Insert: Omit<ClientAttendance, "id" | "created_at"> & { id?: string; created_at?: string };
+        Update: Partial<Omit<ClientAttendance, "id">>;
       };
     };
     Enums: {
