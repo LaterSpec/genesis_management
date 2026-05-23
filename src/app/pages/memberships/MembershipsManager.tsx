@@ -23,6 +23,7 @@ function PlanDrawer({ isOpen, editingPlan, onClose, onSaved }: PlanDrawerProps) 
   const [animating, setAnimating] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [isLimitActive, setIsLimitActive] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   const initial = editingPlan
@@ -39,12 +40,13 @@ function PlanDrawer({ isOpen, editingPlan, onClose, onSaved }: PlanDrawerProps) 
       setVisible(true);
       requestAnimationFrame(() => requestAnimationFrame(() => setAnimating(true)));
       setIsDirty(false);
+      setIsLimitActive(editingPlan !== null && editingPlan.allowed_entries !== null && editingPlan.allowed_entries !== undefined);
     } else {
       setAnimating(false);
       const t = setTimeout(() => setVisible(false), 300);
       return () => clearTimeout(t);
     }
-  }, [isOpen]);
+  }, [isOpen, editingPlan]);
 
   const checkDirty = useCallback(() => {
     if (!formRef.current) return;
@@ -70,6 +72,7 @@ function PlanDrawer({ isOpen, editingPlan, onClose, onSaved }: PlanDrawerProps) 
         description: (fd.get("description") as string) || null,
         price: parseFloat(fd.get("price") as string),
         duration_days: parseInt(fd.get("duration_days") as string, 10),
+        allowed_entries: isLimitActive ? parseInt(fd.get("allowed_entries") as string, 10) : null,
       };
       if (editingPlan) {
         await editPlanAction(editingPlan.id, data);
@@ -178,6 +181,48 @@ function PlanDrawer({ isOpen, editingPlan, onClose, onSaved }: PlanDrawerProps) 
             </div>
           </div>
 
+          {/* Toggle Límite de Ingresos */}
+          <div className="flex items-center justify-between bg-surface-container rounded-xl p-4 transition-colors">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-semibold text-on-surface">Limitar por ingresos</span>
+              <span className="text-xs text-on-surface/50 font-body">El plan vencerá al consumir todos los ingresos</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setIsLimitActive(!isLimitActive);
+                setIsDirty(true);
+              }}
+              className={`w-12 h-7 rounded-full transition-colors relative flex items-center p-1 cursor-pointer ${
+                isLimitActive ? "bg-primary" : "bg-outline-variant/40"
+              }`}
+            >
+              <span
+                className={`w-5 h-5 rounded-full bg-white shadow-md transition-transform transform ${
+                  isLimitActive ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Cantidad de Ingresos */}
+          {isLimitActive && (
+            <div className="animate-[fadeIn_0.2s_ease-out]">
+              <label className="block text-xs font-semibold text-on-surface/60 uppercase tracking-wider mb-2">
+                Cantidad de ingresos permitidos
+              </label>
+              <input
+                required
+                type="number"
+                min="1"
+                name="allowed_entries"
+                defaultValue={editingPlan && editingPlan.allowed_entries !== null ? String(editingPlan.allowed_entries) : "30"}
+                className={inputCls}
+                placeholder="Ej. 30"
+              />
+            </div>
+          )}
+
           {/* Descripción */}
           <div>
             <label className="block text-xs font-semibold text-on-surface/60 uppercase tracking-wider mb-2">
@@ -268,6 +313,8 @@ function PlanCard({
       : `${plan.duration_days} días`;
 
   const isDaily = plan.duration_days <= 1;
+  const isLimited = plan.allowed_entries !== null && plan.allowed_entries !== undefined;
+  const badgeLabel = isLimited ? `${plan.allowed_entries} ing. / ${durationLabel}` : durationLabel;
 
   return (
     <div
@@ -292,7 +339,7 @@ function PlanCard({
           </span>
         </div>
         <span className="font-body text-[11px] font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">
-          {durationLabel}
+          {badgeLabel}
         </span>
       </div>
 
@@ -300,7 +347,7 @@ function PlanCard({
       <div>
         <h3 className="font-headline font-bold text-xl text-on-surface mb-1">{plan.name}</h3>
         <p className="font-body text-sm text-on-surface/60 line-clamp-2">
-          {plan.description ?? `Acceso por ${durationLabel}.`}
+          {plan.description ?? (isLimited ? `Acceso para ${plan.allowed_entries} ingresos durante ${durationLabel}.` : `Acceso por ${durationLabel}.`)}
         </p>
       </div>
 
@@ -309,7 +356,9 @@ function PlanCard({
         <span className="font-headline font-extrabold text-4xl text-on-surface">
           S/ {Number(plan.price).toFixed(2)}
         </span>
-        <span className="font-body text-sm text-on-surface/40 ml-2">/ {durationLabel}</span>
+        <span className="font-body text-sm text-on-surface/40 ml-2">
+          / {isLimited ? `${durationLabel} (${plan.allowed_entries} ing.)` : durationLabel}
+        </span>
       </div>
 
       {/* Actions (visible on hover) */}
@@ -590,7 +639,33 @@ export default function MembershipsManager({
                           </td>
                           {/* Plan */}
                           <td className="py-4 px-6 font-body text-sm text-on-surface/80">
-                            {m.membership_plans?.name ?? "—"}
+                            <div>
+                              <p className="font-semibold text-on-surface">{m.membership_plans?.name ?? "—"}</p>
+                              {m.allowed_entries !== null && m.allowed_entries !== undefined ? (
+                                <div className="mt-2 w-full max-w-[150px]">
+                                  <div className="flex justify-between items-center text-[10px] font-bold text-on-surface/50 mb-1">
+                                    <span>Ingresos</span>
+                                    <span>{m.used_entries} / {m.allowed_entries}</span>
+                                  </div>
+                                  <div className="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+                                    <div
+                                      className={`h-full rounded-full transition-all duration-500 ${
+                                        m.used_entries >= m.allowed_entries
+                                          ? "bg-error"
+                                          : m.used_entries >= m.allowed_entries * 0.8
+                                          ? "bg-amber-500"
+                                          : "bg-primary"
+                                      }`}
+                                      style={{ width: `${Math.min(100, (m.used_entries / m.allowed_entries) * 100)}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="inline-block text-[9px] font-bold uppercase tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded mt-1.5">
+                                  Ilimitado
+                                </span>
+                              )}
+                            </div>
                           </td>
                           {/* Inicio */}
                           <td className="py-4 px-6 font-body text-sm text-on-surface/60">

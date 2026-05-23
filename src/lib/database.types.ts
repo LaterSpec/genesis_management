@@ -41,6 +41,7 @@ export interface MembershipPlan {
   description: string | null;
   price: number;
   duration_days: number;
+  allowed_entries?: number | null;
 }
 
 export interface Membership {
@@ -51,6 +52,8 @@ export interface Membership {
   end_date: string;
   status: MembershipStatus;
   created_at: string;
+  allowed_entries?: number | null;
+  used_entries: number;
   // Relaciones opcionales (eager load)
   membership_plans?: MembershipPlan;
   clients?: Client;

@@ -164,7 +164,7 @@ export async function getMembershipPlans(): Promise<MembershipPlan[]> {
 
 /** Crea un nuevo plan de membresía. */
 export async function createMembershipPlan(
-  input: Pick<MembershipPlan, "name" | "description" | "price" | "duration_days">
+  input: Pick<MembershipPlan, "name" | "description" | "price" | "duration_days" | "allowed_entries">
 ): Promise<MembershipPlan> {
   const { data, error } = await supabase
     .from("membership_plans")
@@ -179,7 +179,7 @@ export async function createMembershipPlan(
 /** Actualiza un plan de membresía. */
 export async function updateMembershipPlan(
   id: string,
-  input: Partial<Pick<MembershipPlan, "name" | "description" | "price" | "duration_days">>
+  input: Partial<Pick<MembershipPlan, "name" | "description" | "price" | "duration_days" | "allowed_entries">>
 ): Promise<MembershipPlan> {
   const { data, error } = await supabase
     .from("membership_plans")
@@ -227,6 +227,17 @@ export async function createClientMembership(
   planId: string,
   durationDays: number
 ): Promise<Membership> {
+  // Obtener la información del plan para verificar si tiene límite de ingresos
+  const { data: plan, error: planError } = await supabase
+    .from("membership_plans")
+    .select("allowed_entries")
+    .eq("id", planId)
+    .single();
+
+  if (planError) {
+    throw new Error(`[clients.api] createClientMembership (fetch plan): ${planError.message}`);
+  }
+
   // Buscar membresía activa vigente del cliente
   const { data: activeMemberships } = await supabase
     .from("memberships")
@@ -257,6 +268,8 @@ export async function createClientMembership(
       start_date: startDate.toISOString(),
       end_date: endDate.toISOString(),
       status: "active",
+      allowed_entries: plan.allowed_entries ?? null,
+      used_entries: 0,
     })
     .select()
     .single();

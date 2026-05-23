@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import type { ProductWithCategory } from "@/lib/api/inventory.api";
-import { addProductAction, editProductAction, removeProductAction } from "./actions";
+import { addProductAction, editProductAction, removeProductAction, adjustStockAction } from "./actions";
 
 // ─── Drawer Component ─────────────────────────────────────────────────────────
 interface ProductDrawerProps {
@@ -261,6 +261,7 @@ function QuickStockPanel({ products }: { products: ProductWithCategory[] }) {
   const [qty, setQty] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<ProductWithCategory | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isPending, setIsPending] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const suggestions = query.length >= 1
@@ -296,16 +297,25 @@ function QuickStockPanel({ products }: { products: ProductWithCategory[] }) {
     setShowSuggestions(true);
   };
 
-  const handleStockUpdate = () => {
+  const handleStockUpdate = async () => {
     if (!selectedProduct) {
       alert("Selecciona un producto de la lista antes de actualizar el stock.");
       return;
     }
-    // In a real integration you'd call adjustProductStock here.
-    alert(`Stock actualizado: ${selectedProduct.name} +${qty} unidades.\n(Integración DB pendiente en este panel.)`);
-    setQuery("");
-    setSelectedProduct(null);
-    setQty(1);
+    
+    setIsPending(true);
+    try {
+      await adjustStockAction(selectedProduct.id, qty);
+      alert(`Stock actualizado: ${selectedProduct.name} +${qty} unidades.`);
+      setQuery("");
+      setSelectedProduct(null);
+      setQty(1);
+    } catch (err: any) {
+      console.error(err);
+      alert(`Error al actualizar el stock: ${err.message || err}`);
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -329,9 +339,10 @@ function QuickStockPanel({ products }: { products: ProductWithCategory[] }) {
               onChange={handleInput}
               onFocus={() => query.length >= 1 && setShowSuggestions(true)}
               autoComplete="off"
+              disabled={isPending}
             />
             {/* Clear */}
-            {query.length > 0 && (
+            {query.length > 0 && !isPending && (
               <button
                 type="button"
                 onClick={() => { setQuery(""); setSelectedProduct(null); setShowSuggestions(false); }}
@@ -393,7 +404,8 @@ function QuickStockPanel({ products }: { products: ProductWithCategory[] }) {
             <button
               type="button"
               onClick={() => setQty((q) => Math.max(1, q - 1))}
-              className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface hover:bg-surface-container-highest transition-colors cursor-pointer"
+              disabled={isPending}
+              className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface hover:bg-surface-container-highest transition-colors cursor-pointer disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-sm">remove</span>
             </button>
@@ -403,11 +415,13 @@ function QuickStockPanel({ products }: { products: ProductWithCategory[] }) {
               min="1"
               value={qty}
               onChange={(e) => setQty(Math.max(1, parseInt(e.target.value) || 1))}
+              disabled={isPending}
             />
             <button
               type="button"
               onClick={() => setQty((q) => q + 1)}
-              className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface hover:bg-surface-container-highest transition-colors cursor-pointer"
+              disabled={isPending}
+              className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface hover:bg-surface-container-highest transition-colors cursor-pointer disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-sm">add</span>
             </button>
@@ -417,9 +431,17 @@ function QuickStockPanel({ products }: { products: ProductWithCategory[] }) {
         <button
           type="button"
           onClick={handleStockUpdate}
-          className="w-full bg-gradient-cta text-white font-body font-semibold py-3 rounded-xl mt-4 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-shadow cursor-pointer"
+          disabled={isPending}
+          className="w-full bg-gradient-cta text-white font-body font-semibold py-3 rounded-xl mt-4 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Actualizar Stock
+          {isPending ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              <span>Actualizando…</span>
+            </>
+          ) : (
+            <span>Actualizar Stock</span>
+          )}
         </button>
       </div>
     </div>
@@ -445,6 +467,22 @@ export default function InventoryManager({
   const filteredProducts = initialProducts.filter((p) =>
     filterCategory === "Todos" ? true : p.categories?.name === filterCategory
   );
+
+  // Calcular distribución dinámicamente en base a los productos actuales
+  const totalProducts = initialProducts.length;
+  const countMap: Record<string, number> = {};
+  initialProducts.forEach((p) => {
+    const name = p.categories?.name ?? "Sin categoría";
+    countMap[name] = (countMap[name] ?? 0) + 1;
+  });
+
+  const dynamicDistribution = Object.entries(countMap)
+    .map(([category, count]) => ({
+      category,
+      count,
+      percentage: totalProducts > 0 ? Math.round((count / totalProducts) * 100) : 0,
+    }))
+    .sort((a, b) => a.category.localeCompare(b.category));
 
   const openAdd = () => { setEditingProduct(null); setIsDrawerOpen(true); };
   const openEdit = (p: ProductWithCategory) => { setEditingProduct(p); setIsDrawerOpen(true); };
@@ -607,15 +645,15 @@ export default function InventoryManager({
               Desglose del inventario por categoría.
             </p>
             <div className="space-y-4 relative z-10">
-              {distribution.map((item) => (
+              {dynamicDistribution.map((item) => (
                 <div key={item.category}>
                   <div className="flex justify-between text-xs font-body font-medium mb-1">
                     <span className="text-on-surface">{item.category}</span>
-                    <span className="text-primary-container">{item.percentage}%</span>
+                    <span className="text-primary">{item.percentage}%</span>
                   </div>
                   <div className="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
                     <div
-                      className="bg-primary-container h-1.5 rounded-full"
+                      className="bg-primary h-1.5 rounded-full transition-all duration-500"
                       style={{ width: `${item.percentage}%` }}
                     />
                   </div>

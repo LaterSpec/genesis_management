@@ -1,6 +1,6 @@
 "use server";
 
-import { createProduct, updateProduct, deleteProduct, createCategory } from "@/lib/api/inventory.api";
+import { createProduct, updateProduct, deleteProduct, createCategory, adjustProductStock } from "@/lib/api/inventory.api";
 import { revalidatePath } from "next/cache";
 
 export async function addProductAction(data: any, newCategoryName?: string) {
@@ -30,3 +30,10 @@ export async function removeProductAction(id: string) {
   revalidatePath("/pages/inventory");
   revalidatePath("/pages/dashboard");
 }
+
+export async function adjustStockAction(productId: string, delta: number) {
+  await adjustProductStock(productId, delta);
+  revalidatePath("/pages/inventory");
+  revalidatePath("/pages/dashboard");
+}
+

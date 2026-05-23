@@ -13,7 +13,7 @@ const PATHS = ["/pages/memberships", "/pages/dashboard", "/pages/clients"];
 const revalidateAll = () => PATHS.forEach((p) => revalidatePath(p));
 
 export async function addPlanAction(
-  input: Pick<MembershipPlan, "name" | "description" | "price" | "duration_days">
+  input: Pick<MembershipPlan, "name" | "description" | "price" | "duration_days" | "allowed_entries">
 ) {
   await createMembershipPlan(input);
   revalidateAll();
@@ -21,7 +21,7 @@ export async function addPlanAction(
 
 export async function editPlanAction(
   id: string,
-  input: Partial<Pick<MembershipPlan, "name" | "description" | "price" | "duration_days">>
+  input: Partial<Pick<MembershipPlan, "name" | "description" | "price" | "duration_days" | "allowed_entries">>
 ) {
   await updateMembershipPlan(id, input);
   revalidateAll();

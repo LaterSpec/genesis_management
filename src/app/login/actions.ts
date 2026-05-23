@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 const AUTH_UNAVAILABLE_MESSAGE =
   "No se pudo conectar con el servicio de autenticacion. Verifica que Supabase local este iniciado.";
@@ -42,6 +43,7 @@ export async function login(formData: FormData) {
   }
 
   console.log("[LOGIN SUCCESS] user:", data.user?.email);
+  revalidatePath("/", "layout");
   return redirect("/pages/dashboard");
 }
 
@@ -49,4 +51,15 @@ export async function logout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   return redirect("/login");
+}
+
+/**
+ * Cierra la sesión en el servidor (cookie) sin hacer redirect.
+ * El cliente llama a window.location.assign('/login') después de esta
+ * acción para forzar un hard reload que destruye todo el estado de React.
+ * No usar revalidatePath aquí: invalida el layout en todas las pestañas del dev server.
+ */
+export async function signOutOnlyAction() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
 }

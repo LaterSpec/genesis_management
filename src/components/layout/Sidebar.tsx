@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { logout } from "@/app/login/actions";
+import { signOutOnlyAction } from "@/app/login/actions";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useCashSession } from "./CashSessionContext";
@@ -25,11 +25,11 @@ export default function Sidebar() {
   const { activeSession, userProfile, closeSession } = useCashSession();
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const supabase = createClient();
 
   useEffect(() => {
     async function checkRole() {
       try {
-        const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           const { data: profile } = await supabase
@@ -52,11 +52,27 @@ export default function Sidebar() {
     ? [...baseNavItems, { name: "Personal", href: "/pages/staff", icon: "badge" }]
     : baseNavItems;
 
+  // Hard logout: cierra sesión en servidor y fuerza un hard reload del navegador.
+  // Esto destruye completamente el árbol de React, el contexto y el router cache de Next.js,
+  // evitando que datos del usuario anterior queden en memoria.
+  const performHardLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      await signOutOnlyAction();
+    } catch (err) {
+      console.error("Error al cerrar sesión:", err);
+    } finally {
+      window.location.assign("/login");
+    }
+  };
+
   const handleLogoutClick = async (e: React.MouseEvent) => {
-    // Si es recepcionista y tiene sesión de caja activa, interceptamos
+    e.preventDefault();
+    // Si es recepcionista y tiene sesión de caja activa, mostramos confirmación
     if (userProfile?.role === "receptionist" && activeSession) {
-      e.preventDefault();
       setShowCloseConfirm(true);
+    } else {
+      await performHardLogout();
     }
   };
 
@@ -64,7 +80,7 @@ export default function Sidebar() {
     try {
       setIsClosing(true);
       await closeSession(); // Cierra el turno en base de datos
-      await logout(); // Ejecuta el cierre de sesión en auth
+      await performHardLogout(); // Hard logout + hard reload
     } catch (err) {
       console.error("Error al cerrar turno y sesión:", err);
       setIsClosing(false);
@@ -114,16 +130,14 @@ export default function Sidebar() {
         </div>
 
         <div className="p-6 mt-auto">
-          <form action={logout}>
-            <button
-              type="submit"
-              onClick={handleLogoutClick}
-              className="text-on-surface/60 flex items-center gap-4 hover:text-error transition-colors w-full text-left cursor-pointer"
-            >
-              <span className="material-symbols-outlined">logout</span>
-              Cerrar Sesión
-            </button>
-          </form>
+          <button
+            type="button"
+            onClick={handleLogoutClick}
+            className="text-on-surface/60 flex items-center gap-4 hover:text-error transition-colors w-full text-left cursor-pointer"
+          >
+            <span className="material-symbols-outlined">logout</span>
+            Cerrar Sesión
+          </button>
         </div>
       </nav>
 

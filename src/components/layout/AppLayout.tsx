@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
 import TopAppBar from "./TopAppBar";
 import { useCashSession } from "./CashSessionContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -13,6 +13,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { activeSession, userProfile, loading, openSession } = useCashSession();
   const [initialAmount, setInitialAmount] = useState<string>("0");
   const [isOpening, setIsOpening] = useState(false);
+
+  useEffect(() => {
+    setInitialAmount("0");
+    setIsOpening(false);
+  }, [userProfile?.id]);
 
   if (isAuthRoute) {
     return <main className="flex-1 flex flex-col min-h-screen relative">{children}</main>;
@@ -27,8 +32,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // El bloqueo de caja es exclusivo para recepcionistas (el admin está exceptuado)
-  const showOpeningOverlay = userProfile?.role === "receptionist" && !activeSession;
+  // Bloqueo de caja solo para recepcionistas sin turno abierto (perfil ya cargado)
+  const showOpeningOverlay =
+    !loading &&
+    userProfile?.role === "receptionist" &&
+    !activeSession;
 
   const handleOpenCash = async (e: React.FormEvent) => {
     e.preventDefault();

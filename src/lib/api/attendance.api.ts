@@ -39,6 +39,8 @@ export interface AttendanceClientLookup {
     id: string;
     planName: string;
     endDate: string;
+    usedEntries?: number;
+    allowedEntries?: number | null;
   } | null;
   warningReason: AttendanceWarningReason | null;
 }
@@ -68,6 +70,13 @@ function formatAttendanceDate(date: Date) {
 
 function isMembershipActive(membership: Membership, referenceDate: Date) {
   if (membership.status !== "active") return false;
+
+  // Si tiene límite de ingresos y ya los agotó, está inactiva
+  if (membership.allowed_entries !== null && membership.allowed_entries !== undefined) {
+    if (membership.used_entries >= membership.allowed_entries) {
+      return false;
+    }
+  }
 
   const start = new Date(membership.start_date).getTime();
   const end = new Date(membership.end_date).getTime();
@@ -120,6 +129,8 @@ function mapLookupClient(
           id: activeMembership.id,
           planName: activeMembership.membership_plans?.name ?? "Sin plan",
           endDate: activeMembership.end_date,
+          usedEntries: activeMembership.used_entries,
+          allowedEntries: activeMembership.allowed_entries,
         }
       : null,
     warningReason: getWarningReason(client.status, activeMembership),
@@ -317,9 +328,10 @@ export async function deleteAttendance(input: {
 
   if (error) throw new Error(`[attendance.api] deleteAttendance: ${error.message}`);
 
+  const clientData = existing?.clients as any;
   const clientName =
-    existing?.clients && !Array.isArray(existing.clients)
-      ? `${existing.clients.first_name} ${existing.clients.last_name}`
+    clientData && !Array.isArray(clientData)
+      ? `${clientData.first_name} ${clientData.last_name}`
       : `cliente #${existing.client_id}`;
 
   await logAction({

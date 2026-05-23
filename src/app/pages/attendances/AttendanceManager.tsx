@@ -82,10 +82,15 @@ function getAttendanceState(
     };
   }
 
+  const isLimited = activeMembership.allowed_entries !== null && activeMembership.allowed_entries !== undefined;
+  const label = activeMembership.membership_plans?.name
+    ? `Membresía: ${activeMembership.membership_plans.name}${
+        isLimited ? ` (${activeMembership.used_entries}/${activeMembership.allowed_entries})` : ""
+      }`
+    : "Membresía activa";
+
   return {
-    label: activeMembership.membership_plans?.name
-      ? `Membresía: ${activeMembership.membership_plans.name}`
-      : "Membresía activa",
+    label,
     className: "bg-primary-container/20 text-primary",
   };
 }
@@ -97,11 +102,15 @@ function SearchResultButton({
   client: AttendanceClientLookup;
   onSelect: (client: AttendanceClientLookup) => void;
 }) {
-  const membershipLabel = client.activeMembership
-    ? `${client.activeMembership.planName} · vence ${new Date(
-        client.activeMembership.endDate
-      ).toLocaleDateString("es-PE")}`
-    : "Sin membresía activa";
+  let membershipLabel = "Sin membresía activa";
+  if (client.activeMembership) {
+    const am = client.activeMembership;
+    const isLimited = am.allowedEntries !== null && am.allowedEntries !== undefined;
+    const entriesLeft = isLimited ? Math.max(0, am.allowedEntries! - (am.usedEntries ?? 0)) : 0;
+    membershipLabel = `${am.planName} ${
+      isLimited ? `(${entriesLeft} de ${am.allowedEntries} ing. restantes)` : ""
+    } · vence ${new Date(am.endDate).toLocaleDateString("es-PE")}`;
+  }
 
   return (
     <button
@@ -474,11 +483,18 @@ export default function AttendanceManager({
                         : "bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200"
                     }`}
                   >
-                    {selectedClient.activeMembership
-                      ? `${selectedClient.activeMembership.planName} · vence ${new Date(
-                          selectedClient.activeMembership.endDate
-                        ).toLocaleDateString("es-PE")}`
-                      : "Sin membresía activa"}
+                    {selectedClient.activeMembership ? (
+                      (() => {
+                        const am = selectedClient.activeMembership;
+                        const isLimited = am.allowedEntries !== null && am.allowedEntries !== undefined;
+                        const entriesLeft = isLimited ? Math.max(0, am.allowedEntries! - (am.usedEntries ?? 0)) : 0;
+                        return `${am.planName} ${
+                          isLimited ? `(${entriesLeft}/${am.allowedEntries} ing. restantes)` : ""
+                        } · vence ${new Date(am.endDate).toLocaleDateString("es-PE")}`;
+                      })()
+                    ) : (
+                      "Sin membresía activa"
+                    )}
                   </span>
                 </div>
 

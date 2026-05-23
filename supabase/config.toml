@@ -380,8 +380,13 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# En Windows, el contenedor vector no puede hablar con el socket de Docker
+# (Network unreachable / Connection refused). Desactivar analytics evita el bucle
+# de reinicio de supabase_vector; la app y la DB local siguen funcionando.
+# Ver: https://github.com/supabase/cli/issues/2505
+# Alternativa: `supabase start -x vector` o exponer Docker por TCP en Docker Desktop.
 [analytics]
-enabled = true
+enabled = false
 port = 55427
 # Configure one of the supported backends: `postgres`, `bigquery`.
 backend = "postgres"

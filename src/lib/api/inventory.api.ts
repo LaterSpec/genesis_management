@@ -130,7 +130,7 @@ export async function getInventoryDistribution(): Promise<
   const total = (data ?? []).length;
 
   for (const row of data ?? []) {
-    const name = (row.categories as { name: string } | null)?.name ?? "Sin categoría";
+    const name = (row.categories as any)?.name ?? "Sin categoría";
     countMap[name] = (countMap[name] ?? 0) + 1;
   }
 
