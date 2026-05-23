@@ -138,10 +138,19 @@ ON CONFLICT (id) DO NOTHING;
 
 SELECT setval('client_credits_id_seq', 4);
 
+-- ─── CASH SESSIONS ────────────────────────────────────────────────────────────
+INSERT INTO cash_sessions (id, user_id, opened_at, closed_at, status, initial_amount) VALUES
+  (1, '00000000-0000-0000-0000-000000000002', NOW() - INTERVAL '5 days 8 hours', NOW() - INTERVAL '5 days', 'closed', 100.00),
+  (2, '00000000-0000-0000-0000-000000000002', NOW() - INTERVAL '1 day 8 hours', NOW() - INTERVAL '1 day', 'closed', 50.00),
+  (3, '00000000-0000-0000-0000-000000000002', NOW() - INTERVAL '3 hours', NULL, 'open', 80.00)
+ON CONFLICT (id) DO NOTHING;
+
+SELECT setval('cash_sessions_id_seq', 3);
+
 -- ─── SALES & TRANSACTIONS ──────────────────────────────────────────────────────
 -- Venta 1: Renovación anual Carlos Mendoza
-INSERT INTO sales (id, client_id, total, status, created_at, seller_id)
-VALUES (1, 1, 450.00, 'completed', NOW() - INTERVAL '5 days', '00000000-0000-0000-0000-000000000002')
+INSERT INTO sales (id, client_id, total, status, created_at, seller_id, cash_session_id)
+VALUES (1, 1, 450.00, 'completed', NOW() - INTERVAL '5 days', '00000000-0000-0000-0000-000000000002', 1)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sale_items (id, sale_id, membership_id, quantity, unit_price)
@@ -153,8 +162,8 @@ VALUES (1, 'income', 450.00, 'Renovación Anual - Carlos M.', 'Membresía', 1, N
 ON CONFLICT DO NOTHING;
 
 -- Venta 2: Proteína Whey 2kg
-INSERT INTO sales (id, client_id, total, status, created_at, seller_id)
-VALUES (2, 2, 85.00, 'completed', NOW() - INTERVAL '2 hours', '00000000-0000-0000-0000-000000000002')
+INSERT INTO sales (id, client_id, total, status, created_at, seller_id, cash_session_id)
+VALUES (2, 2, 85.00, 'completed', NOW() - INTERVAL '2 hours', '00000000-0000-0000-0000-000000000002', 3)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sale_items (id, sale_id, product_id, quantity, unit_price)
@@ -171,8 +180,8 @@ VALUES (3, 'expense', 320.00, 'Mantenimiento Equipos', 'Operaciones', NOW() - IN
 ON CONFLICT DO NOTHING;
 
 -- Venta 3: Plan Mensual Ana Gómez
-INSERT INTO sales (id, client_id, total, status, created_at, seller_id)
-VALUES (3, 10, 45.00, 'completed', NOW() - INTERVAL '1 day', '00000000-0000-0000-0000-000000000002')
+INSERT INTO sales (id, client_id, total, status, created_at, seller_id, cash_session_id)
+VALUES (3, 10, 45.00, 'completed', NOW() - INTERVAL '1 day', '00000000-0000-0000-0000-000000000002', 2)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sale_items (id, sale_id, membership_id, quantity, unit_price)

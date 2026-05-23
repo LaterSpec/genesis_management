@@ -81,7 +81,10 @@ export default async function ActivityLogPage() {
                   Fecha/Hora
                 </th>
                 <th className="py-5 px-8 font-label text-[10px] font-black text-secondary uppercase tracking-widest">
-                  Usuario / Cliente
+                  Realizado Por (Staff)
+                </th>
+                <th className="py-5 px-8 font-label text-[10px] font-black text-secondary uppercase tracking-widest">
+                  Cliente / Receptor
                 </th>
                 <th className="py-5 px-8 font-label text-[10px] font-black text-secondary uppercase tracking-widest">
                   Acción Realizada
@@ -94,7 +97,7 @@ export default async function ActivityLogPage() {
             <tbody className="font-body text-sm divide-y divide-outline-variant/5">
               {logs.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-12 text-center text-on-surface/40 font-body text-sm">
+                  <td colSpan={5} className="py-12 text-center text-on-surface/40 font-body text-sm">
                     No hay registros de actividad.
                   </td>
                 </tr>
@@ -153,6 +156,9 @@ const ACTION_STYLES: Record<string, { icon: string; className: string; label: st
   ATTENDANCE_REGISTERED: { icon: "how_to_reg", className: "bg-primary-container/20 text-primary",               label: "Asistencia" },
   ATTENDANCE_DELETED: { icon: "delete", className: "bg-error-container text-on-error-container",                label: "Eliminación" },
   ATTENDANCE_WARNING_APPROVED: { icon: "warning", className: "bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200", label: "Aprobación" },
+  STAFF_CREATED: { icon: "person_add", className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20", label: "Alta Personal" },
+  STAFF_DELETED: { icon: "person_remove", className: "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20", label: "Baja Personal" },
+  STAFF_PASSWORD_CHANGED: { icon: "key", className: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20", label: "Clave Staff" },
 };
 
 function LogEntry({ log }: { log: ActivityLogFull }) {
@@ -162,22 +168,33 @@ function LogEntry({ log }: { log: ActivityLogFull }) {
     label: log.action_type,
   };
 
-  const actorName = log.clients
-    ? `${log.clients.first_name} ${log.clients.last_name}`
-    : log.profiles
+  // Staff / Actor who performed the action
+  const actorName = log.profiles
     ? `${log.profiles.first_name} ${log.profiles.last_name}`
     : "Sistema";
 
-  const refInfo = log.clients
-    ? `ID: ${log.client_id}`
-    : undefined;
+  const actorRole = log.profiles?.role;
 
-  const initials = actorName
+  const actorInitials = actorName
     .split(" ")
     .slice(0, 2)
     .map((n) => n[0])
     .join("")
     .toUpperCase();
+
+  // Client affected by the action
+  const clientName = log.clients
+    ? `${log.clients.first_name} ${log.clients.last_name}`
+    : null;
+
+  const clientInitials = clientName
+    ? clientName
+        .split(" ")
+        .slice(0, 2)
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+    : "";
 
   const date = new Date(log.created_at).toLocaleDateString("es-MX", {
     day: "2-digit", month: "short", year: "numeric",
@@ -188,25 +205,55 @@ function LogEntry({ log }: { log: ActivityLogFull }) {
 
   return (
     <tr className="group hover:bg-surface-container-low transition-all duration-300">
+      {/* Date / Time */}
       <td className="py-6 px-8 whitespace-nowrap">
         <div className="font-bold text-on-surface">{date}</div>
         <div className="text-xs text-secondary font-medium">{time}</div>
       </td>
+
+      {/* Realizado Por (Staff) */}
       <td className="py-6 px-8">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-bold text-xs shrink-0">
-            {initials}
+          <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0 select-none shadow-sm">
+            {actorInitials}
           </div>
           <div>
             <div className="font-bold text-on-surface group-hover:text-primary transition-colors">
               {actorName}
             </div>
-            {refInfo && (
-              <div className="text-xs text-secondary font-medium">{refInfo}</div>
+            {actorRole ? (
+              <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mt-0.5 ${
+                actorRole === "administrator" 
+                  ? "bg-primary-container/20 text-primary border border-primary/10" 
+                  : "bg-secondary-container/20 text-secondary border border-secondary/10"
+              }`}>
+                {actorRole === "administrator" ? "Administrador" : "Recepcionista"}
+              </span>
+            ) : (
+              <span className="text-[10px] font-semibold text-secondary/50">Sistema</span>
             )}
           </div>
         </div>
       </td>
+
+      {/* Cliente / Receptor */}
+      <td className="py-6 px-8">
+        {clientName ? (
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-secondary-container/20 text-secondary flex items-center justify-center font-semibold text-[10px] shrink-0 select-none">
+              {clientInitials}
+            </div>
+            <div>
+              <div className="font-bold text-on-surface text-xs">{clientName}</div>
+              <div className="text-[10px] text-secondary/60">Cliente #{log.client_id}</div>
+            </div>
+          </div>
+        ) : (
+          <span className="text-secondary/30 italic text-xs select-none">—</span>
+        )}
+      </td>
+
+      {/* Acción Realizada */}
       <td className="py-6 px-8">
         <span
           className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${style.className} shadow-sm`}
@@ -215,7 +262,11 @@ function LogEntry({ log }: { log: ActivityLogFull }) {
           {style.label}
         </span>
       </td>
-      <td className="py-6 px-8 text-on-surface-variant font-medium">{log.description}</td>
+
+      {/* Detalles */}
+      <td className="py-6 px-8 text-on-surface-variant font-medium max-w-xs truncate" title={log.description}>
+        {log.description}
+      </td>
     </tr>
   );
 }

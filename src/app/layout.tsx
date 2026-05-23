@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import AppLayout from "@/components/layout/AppLayout";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { CashSessionProvider } from "@/components/layout/CashSessionContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -50,7 +51,9 @@ export default function RootLayout({
       </head>
       <body className="antialiased bg-surface text-on-surface flex min-h-screen">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AppLayout>{children}</AppLayout>
+          <CashSessionProvider>
+            <AppLayout>{children}</AppLayout>
+          </CashSessionProvider>
         </ThemeProvider>
       </body>
     </html>

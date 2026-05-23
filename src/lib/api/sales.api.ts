@@ -92,11 +92,27 @@ export async function createSale(input: CreateSaleInput): Promise<Sale> {
   );
 
   // 1. Insertar la venta principal
+  let cashSessionId: number | null = null;
+  if (input.seller_id) {
+    const { data: activeSession } = await supabase
+      .from("cash_sessions")
+      .select("id")
+      .eq("user_id", input.seller_id)
+      .eq("status", "open")
+      .is("closed_at", null)
+      .maybeSingle();
+      
+    if (activeSession) {
+      cashSessionId = activeSession.id;
+    }
+  }
+
   const { data: sale, error: saleError } = await supabase
     .from("sales")
     .insert({
       client_id: input.client_id,
       seller_id: input.seller_id ?? null,
+      cash_session_id: cashSessionId,
       total,
       status: "completed",
       payment_method: input.payment_method,

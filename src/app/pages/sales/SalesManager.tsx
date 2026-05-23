@@ -57,7 +57,7 @@ function SuccessModal({
           <div className="flex justify-between items-center">
             <span className="font-body text-sm text-on-surface/60">Total cobrado</span>
             <span className="font-headline font-extrabold text-2xl text-primary">
-              ${total.toFixed(2)}
+              S/ {total.toFixed(2)}
             </span>
           </div>
           <div className="flex justify-between items-center">
@@ -347,7 +347,7 @@ export default function SalesManager({ products, plans, clients, visitorId }: Pr
                     </p>
                   </div>
                   <span className="font-headline font-extrabold text-2xl text-on-surface">
-                    ${Number(plan.price).toFixed(2)}
+                    S/ {Number(plan.price).toFixed(2)}
                   </span>
                 </button>
               ))}
@@ -387,7 +387,7 @@ export default function SalesManager({ products, plans, clients, visitorId }: Pr
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="font-headline font-extrabold text-lg text-primary">
-                        ${product.price.toFixed(2)}
+                        S/ {product.price.toFixed(2)}
                       </span>
                       <div className="flex flex-col items-end">
                         {isLow && (
@@ -554,7 +554,7 @@ export default function SalesManager({ products, plans, clients, visitorId }: Pr
 
                       {/* Fixed price */}
                       <div className="flex items-center gap-1">
-                        <span className="font-body text-xs text-on-surface/40">$</span>
+                        <span className="font-body text-xs text-on-surface/40">S/</span>
                         <span className="w-20 bg-surface-container-high rounded-lg px-2 py-1 text-sm font-bold text-on-surface text-right">
                           {Number(item.unit_price).toFixed(2)}
                         </span>
@@ -565,7 +565,7 @@ export default function SalesManager({ products, plans, clients, visitorId }: Pr
                       <span className="font-body text-xs text-on-surface/50">
                         Subtotal:{" "}
                         <span className="font-bold text-on-surface">
-                          ${(item.quantity * item.unit_price).toFixed(2)}
+                          S/ {(item.quantity * item.unit_price).toFixed(2)}
                         </span>
                       </span>
                     </div>
@@ -609,7 +609,7 @@ export default function SalesManager({ products, plans, clients, visitorId }: Pr
               <div className="flex justify-between items-center">
                 <span className="font-body text-secondary text-sm">Total</span>
                 <span className="font-headline font-extrabold text-2xl text-on-surface">
-                  ${cartTotal.toFixed(2)}
+                  S/ {cartTotal.toFixed(2)}
                 </span>
               </div>
               <button

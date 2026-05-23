@@ -149,7 +149,7 @@ function PlanDrawer({ isOpen, editingPlan, onClose, onSaved }: PlanDrawerProps) 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-on-surface/60 uppercase tracking-wider mb-2">
-                Precio ($)
+                Precio (S/)
               </label>
               <input
                 required
@@ -307,7 +307,7 @@ function PlanCard({
       {/* Price */}
       <div className="mt-auto">
         <span className="font-headline font-extrabold text-4xl text-on-surface">
-          ${Number(plan.price).toFixed(2)}
+          S/ {Number(plan.price).toFixed(2)}
         </span>
         <span className="font-body text-sm text-on-surface/40 ml-2">/ {durationLabel}</span>
       </div>

@@ -58,6 +58,7 @@ erDiagram
         uuid id PK
         uuid client_id FK "nullable"
         uuid seller_id FK
+        bigint cash_session_id FK "nullable"
         numeric total
         string status
         timestamptz created_at
@@ -99,8 +100,19 @@ erDiagram
         timestamptz created_at
     }
 
+    CASH_SESSIONS {
+        bigint id PK
+        uuid user_id FK
+        timestamptz opened_at
+        timestamptz closed_at "nullable"
+        string status "open | closed"
+        numeric initial_amount
+    }
+
     PROFILES ||--o{ SALES : "processes"
     PROFILES ||--o{ ACTIVITY_LOGS : "performs"
+    PROFILES ||--o{ CASH_SESSIONS : "opens"
+    CASH_SESSIONS ||--o{ SALES : "contains"
     CLIENTS ||--o{ MEMBERSHIPS : "has"
     CLIENTS ||--o{ SALES : "makes"
     CLIENTS ||--o| CLIENT_CREDITS : "owes"
@@ -111,4 +123,5 @@ erDiagram
     PRODUCTS ||--o{ SALE_ITEMS : "included_as"
     MEMBERSHIPS ||--o{ SALE_ITEMS : "included_as"
     SALES ||--o| FINANCIAL_TRANSACTIONS : "generates"
+```,StartLine:57,TargetContent:
 ```

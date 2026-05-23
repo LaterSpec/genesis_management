@@ -18,6 +18,9 @@ export interface Profile {
   first_name: string;
   last_name: string;
   role: RoleEnum;
+  birth_date?: string | null;
+  registration_date?: string | null;
+  gender?: string | null;
   created_at: string; // TIMESTAMPTZ como ISO string
 }
 

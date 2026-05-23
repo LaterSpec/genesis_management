@@ -83,7 +83,7 @@ export default async function DashboardPage() {
             </span>
           </div>
           <h3 className="font-headline font-extrabold text-4xl text-on-surface relative z-10">
-            ${monthlySales >= 1000
+            S/ {monthlySales >= 1000
               ? `${(monthlySales / 1000).toFixed(1)}K`
               : monthlySales.toFixed(0)}
           </h3>
@@ -105,7 +105,7 @@ export default async function DashboardPage() {
             </span>
           </div>
           <h3 className="font-headline font-extrabold text-4xl text-on-surface relative z-10">
-            ${creditTotal.toLocaleString("es-MX", { minimumFractionDigits: 0 })}
+            S/ {creditTotal.toLocaleString("es-MX", { minimumFractionDigits: 0 })}
           </h3>
           <div className="mt-4 flex items-center gap-2 relative z-10">
             <span className="text-sm font-semibold text-error">Cartera activa de deudas</span>
@@ -167,7 +167,7 @@ export default async function DashboardPage() {
                   style={{ height: `${heightPct}%` }}
                 >
                   <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-on-surface text-surface text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                    {dayLabel} · ${day.income.toFixed(0)}
+                    {dayLabel} · S/ {day.income.toFixed(0)}
                   </div>
                 </div>
               );

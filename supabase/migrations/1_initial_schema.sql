@@ -1,6 +1,6 @@
 -- =============================================================================
--- GenesisGym Initial Schema
--- Recreado para tener todo en una única migración de inicio
+-- GenesisGym Unified Database Schema
+-- Combined initial schema, payment methods, sale plan IDs, and attendances
 -- =============================================================================
 
 -- Enums
@@ -8,7 +8,7 @@ CREATE TYPE role_enum AS ENUM ('administrator', 'receptionist');
 CREATE TYPE membership_status AS ENUM ('active', 'expired', 'cancelled');
 CREATE TYPE transaction_type AS ENUM ('income', 'expense');
 
--- Table: profiles (Extends auth.users, debe mantener UUID por compatibilidad con Supabase Auth)
+-- Table: profiles (Extends auth.users, UUID references auth.users)
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   first_name TEXT NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE profiles (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Table: clients (IDs convertidos a BIGSERIAL)
+-- Table: clients
 CREATE TABLE clients (
   id BIGSERIAL PRIMARY KEY,
   dni TEXT UNIQUE NOT NULL,
@@ -76,7 +76,8 @@ CREATE TABLE sales (
   total NUMERIC(10, 2) NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   status TEXT NOT NULL DEFAULT 'completed',
-  seller_id UUID REFERENCES profiles(id) ON DELETE SET NULL
+  seller_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  payment_method TEXT NOT NULL DEFAULT 'efectivo' CHECK (payment_method IN ('efectivo', 'tarjeta', 'yape'))
 );
 
 -- Table: sale_items
@@ -86,7 +87,8 @@ CREATE TABLE sale_items (
   product_id BIGINT REFERENCES products(id) ON DELETE SET NULL,
   membership_id BIGINT REFERENCES memberships(id) ON DELETE SET NULL,
   quantity INTEGER NOT NULL,
-  unit_price NUMERIC(10, 2) NOT NULL
+  unit_price NUMERIC(10, 2) NOT NULL,
+  plan_id BIGINT REFERENCES membership_plans(id) ON DELETE SET NULL
 );
 
 -- Table: financial_transactions
@@ -104,7 +106,7 @@ CREATE TABLE financial_transactions (
 CREATE TABLE client_credits (
   id BIGSERIAL PRIMARY KEY,
   client_id BIGINT UNIQUE NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
-  balance NUMERIC(10, 2) NOT NULL DEFAULT 0, -- Deuda actual del cliente
+  balance NUMERIC(10, 2) NOT NULL DEFAULT 0,
   last_updated TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -119,8 +121,24 @@ CREATE TABLE activity_logs (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Table: client_attendances
+CREATE TABLE client_attendances (
+  id BIGSERIAL PRIMARY KEY,
+  client_id BIGINT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  registered_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  attendance_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  attendance_date DATE NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX client_attendances_attendance_date_idx
+  ON client_attendances (attendance_date DESC, attendance_at DESC);
+
+CREATE INDEX client_attendances_client_id_attendance_date_idx
+  ON client_attendances (client_id, attendance_date DESC);
+
 -- =============================================================================
--- Row Level Security (RLS) - Basic Setup & Dev Policies
+-- Row Level Security (RLS) & Policies
 -- =============================================================================
 
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
@@ -134,9 +152,9 @@ ALTER TABLE sale_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE financial_transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE client_credits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE activity_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_attendances ENABLE ROW LEVEL SECURITY;
 
--- Políticas de desarrollo: Permiten acceso completo al rol anon.
--- IMPORTANTE: Cambiar en producción con políticas restrictivas basadas en el rol.
+-- Development policies: Allow ALL for anonymous/public access.
 CREATE POLICY "Allow ALL for anon on profiles" ON profiles FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow ALL for anon on clients" ON clients FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow ALL for anon on membership_plans" ON membership_plans FOR ALL USING (true) WITH CHECK (true);
@@ -148,4 +166,13 @@ CREATE POLICY "Allow ALL for anon on sale_items" ON sale_items FOR ALL USING (tr
 CREATE POLICY "Allow ALL for anon on financial_transactions" ON financial_transactions FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow ALL for anon on client_credits" ON client_credits FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow ALL for anon on activity_logs" ON activity_logs FOR ALL USING (true) WITH CHECK (true);
-WA
+CREATE POLICY "Allow ALL for anon on client_attendances" ON client_attendances FOR ALL USING (true) WITH CHECK (true);
+
+-- =============================================================================
+-- Initial System Inserts
+-- =============================================================================
+
+-- Insert visitor wildcard client DNI: 00000000
+INSERT INTO clients (dni, first_name, last_name, email, phone, status, join_date)
+VALUES ('00000000', 'Visitante', 'Ocasional', NULL, NULL, 'active', NOW())
+ON CONFLICT (dni) DO NOTHING;

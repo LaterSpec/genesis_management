@@ -2,8 +2,9 @@
 
 import { useSearchParams } from "next/navigation";
 import { login } from "./actions";
+import { Suspense } from "react";
 
-export default function LoginPage() {
+function LoginContent() {
   const searchParams = useSearchParams();
   const message = searchParams.get("message");
 
@@ -69,5 +70,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex w-full min-h-screen items-center justify-center bg-surface">
+        <span className="w-8 h-8 border-3 border-primary/20 border-t-primary rounded-full animate-spin"></span>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }

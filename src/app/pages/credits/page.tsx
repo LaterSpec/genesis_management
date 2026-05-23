@@ -37,7 +37,7 @@ export default async function CreditsPage() {
                 Cartera Total Activa
               </p>
               <h3 className="font-headline text-5xl md:text-6xl font-black text-on-surface mt-4 tracking-tighter">
-                ${portfolioTotal.toLocaleString("es-MX", { minimumFractionDigits: 0 })}
+                S/ {portfolioTotal.toLocaleString("es-MX", { minimumFractionDigits: 0 })}
                 <span className="text-2xl text-secondary font-semibold">.00</span>
               </h3>
             </div>
@@ -60,7 +60,7 @@ export default async function CreditsPage() {
                 Deuda Crítica
               </p>
               <h3 className="font-headline text-4xl font-black text-on-error-container mt-4 tracking-tight">
-                ${overdueTotal.toLocaleString("es-MX", { minimumFractionDigits: 0 })}
+                S/ {overdueTotal.toLocaleString("es-MX", { minimumFractionDigits: 0 })}
               </h3>
             </div>
             <div className="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center">
@@ -147,7 +147,7 @@ function CreditRow({ credit }: { credit: ClientCreditWithClient }) {
       {/* Monto */}
       <div className="col-span-3 md:col-span-3 text-right">
         <p className="font-headline font-bold text-xl text-on-surface">
-          ${credit.balance.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+          S/ {credit.balance.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
         </p>
       </div>
 

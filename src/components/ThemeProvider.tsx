@@ -64,7 +64,7 @@ export function ThemeProvider({
   const systemTheme = React.useSyncExternalStore(
     subscribeToSystemTheme,
     getSystemTheme,
-    () => "light"
+    () => "light" as ResolvedTheme
   );
   const [theme, setThemeState] = React.useState<ThemeName>(() =>
     getStoredTheme(storageKey, defaultTheme)

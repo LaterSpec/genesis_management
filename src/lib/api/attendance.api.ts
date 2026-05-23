@@ -167,7 +167,7 @@ export async function getAttendanceClients(): Promise<AttendanceClientLookup[]> 
     .order("first_name", { ascending: true });
 
   if (error) throw new Error(`[attendance.api] getAttendanceClients: ${error.message}`);
-  return (data ?? []).map((client) =>
+  return (data ?? []).map((client: any) =>
     mapLookupClient(client as ClientWithMemberships, referenceDate)
   );
 }
