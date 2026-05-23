@@ -38,19 +38,23 @@ export interface CreateStaffInput {
   password: string;
   birth_date?: string;
   gender?: string;
+  role?: "administrator" | "receptionist";
 }
 
 /**
  * Obtiene la lista unificada de todo el personal cruzando la tabla de perfiles 'profiles'
  * con los correos electrónicos de 'auth.users' de forma administrativa.
  */
-export async function getStaffList(): Promise<StaffMember[]> {
+export async function getStaffList(options?: { includeInactive?: boolean }): Promise<StaffMember[]> {
   const serviceClient = getServiceRoleClient();
 
-  // 1. Obtener todos los perfiles
-  const { data: profiles, error: profilesError } = await serviceClient
-    .from("profiles")
-    .select("*")
+  // 1. Obtener los perfiles (por defecto solo activos)
+  let query = serviceClient.from("profiles").select("*");
+  if (!options?.includeInactive) {
+    query = query.eq("is_active", true);
+  }
+
+  const { data: profiles, error: profilesError } = await query
     .order("created_at", { ascending: false });
 
   if (profilesError) {
@@ -75,7 +79,7 @@ export async function getStaffList(): Promise<StaffMember[]> {
 }
 
 /**
- * Registra una cuenta de personal (recepcionista) con email pre-confirmado.
+ * Registra una cuenta de personal (recepcionista o administrador) con email pre-confirmado.
  * Implementa rollback automático: si falla la creación del perfil en base de datos,
  * borra la cuenta en auth para evitar registros huérfanos.
  */
@@ -107,9 +111,10 @@ export async function createStaffUser(input: CreateStaffInput): Promise<StaffMem
         id: newUserId,
         first_name: input.first_name,
         last_name: input.last_name,
-        role: "receptionist",
+        role: input.role || "receptionist",
         birth_date: input.birth_date || null,
         gender: input.gender || null,
+        is_active: true,
         registration_date: new Date().toISOString(),
       })
       .select()
@@ -131,12 +136,15 @@ export async function createStaffUser(input: CreateStaffInput): Promise<StaffMem
 }
 
 /**
- * Elimina una cuenta de personal tanto de la autenticación de Supabase como de
- * la tabla de perfiles en cascada.
+ * Desactiva una cuenta de personal en la tabla de perfiles (Soft Delete)
+ * para mantener la integridad referencial en registros históricos.
  */
 export async function deleteStaffUser(userId: string): Promise<void> {
   const serviceClient = getServiceRoleClient();
-  const { error } = await serviceClient.auth.admin.deleteUser(userId);
+  const { error } = await serviceClient
+    .from("profiles")
+    .update({ is_active: false })
+    .eq("id", userId);
 
   if (error) {
     throw new Error(`[users.api] deleteStaffUser: ${error.message}`);

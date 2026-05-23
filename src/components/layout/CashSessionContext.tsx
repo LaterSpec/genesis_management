@@ -100,7 +100,7 @@ export function CashSessionProvider({ children }: { children: React.ReactNode })
       try {
         const { data: profile, error } = await supabase
           .from("profiles")
-          .select("id, first_name, last_name, role")
+          .select("id, first_name, last_name, role, is_active")
           .eq("id", userId)
           .single();
 
@@ -113,7 +113,16 @@ export function CashSessionProvider({ children }: { children: React.ReactNode })
           return;
         }
 
-        const typedProfile = profile as UserProfile;
+        const typedProfile = profile as UserProfile & { is_active: boolean };
+
+        if (!typedProfile.is_active) {
+          console.warn("[CashSessionContext] Usuario inactivo, forzando logout.");
+          await supabase.auth.signOut();
+          clearAuthState();
+          window.location.assign("/login?message=" + encodeURIComponent("Tu cuenta ha sido desactivada por el administrador."));
+          return;
+        }
+
         setUserProfile(typedProfile);
         lastSyncedUserId.current = userId;
 

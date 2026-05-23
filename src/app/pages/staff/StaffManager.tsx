@@ -73,6 +73,7 @@ function StaffDrawer({ isOpen, onClose, onSaved }: StaffDrawerProps) {
         last_name: fd.get("last_name") as string,
         email: fd.get("email") as string,
         password: password,
+        role: fd.get("role") as "administrator" | "receptionist",
         birth_date: (fd.get("birth_date") as string) || undefined,
         gender: (fd.get("gender") as string) || undefined,
       };
@@ -215,18 +216,26 @@ function StaffDrawer({ isOpen, onClose, onSaved }: StaffDrawerProps) {
             </div>
           </div>
 
-          {/* Rol (Estático y Pre-seleccionado) */}
+          {/* Rol (Desplegable Interactivo) */}
           <div>
             <label className="block text-xs font-semibold text-on-surface/60 uppercase tracking-wider mb-2">
               Rol Asignado
             </label>
-            <div className="w-full bg-surface-container/40 border border-outline-variant/10 rounded-lg px-4 py-3 text-sm text-on-surface/60 flex items-center gap-2 select-none">
-              <span className="material-symbols-outlined text-[18px] text-primary">badge</span>
-              <span className="font-semibold">Recepcionista</span>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary text-[18px]">badge</span>
+              <select
+                required
+                name="role"
+                className={inputCls + " pl-10 appearance-none cursor-pointer font-semibold"}
+                defaultValue="receptionist"
+              >
+                <option value="receptionist">Recepcionista</option>
+                <option value="administrator">Administrador</option>
+              </select>
+              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface/40 pointer-events-none text-[18px]">
+                arrow_drop_down
+              </span>
             </div>
-            <p className="text-[11px] text-on-surface/40 font-body mt-1">
-              Es el único rol extra disponible enfocado a la gestión del torniquete e ingresos.
-            </p>
           </div>
 
           {/* Fecha de Nacimiento (Opcional) */}
@@ -516,10 +525,10 @@ export default function StaffManager({
                 Confirmar Baja de Personal
               </h3>
               <p className="text-xs text-on-surface/60 font-body mt-2">
-                ¿Seguro que deseas dar de baja y eliminar la cuenta de <span className="font-bold text-on-surface">{deletingStaff.first_name} {deletingStaff.last_name}</span>?
+                ¿Seguro que deseas dar de baja y desactivar la cuenta de <span className="font-bold text-on-surface">{deletingStaff.first_name} {deletingStaff.last_name}</span>?
               </p>
               <p className="text-[11px] text-error font-semibold mt-2 bg-error-container/10 p-2 rounded-lg">
-                ¡Esta acción eliminará por completo su cuenta de acceso y no se puede revertir!
+                El usuario ya no podrá iniciar sesión ni aparecer en los formularios de personal, pero todos sus registros y datos históricos se mantendrán a salvo.
               </p>
             </div>
             <div className="flex justify-end gap-3 text-sm font-semibold pt-2">

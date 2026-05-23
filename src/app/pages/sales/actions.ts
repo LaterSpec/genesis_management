@@ -30,17 +30,20 @@ export async function processSaleAction(
   paymentMethod: PaymentMethod,
   isVisitor: boolean
 ): Promise<ProcessSaleResult> {
+  let userId: string | undefined;
+
   try {
     // Resolve the logged-in seller
     const supabase = await createSupabaseClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
+    userId = user?.id;
 
     const sale = await createSale({
       client_id: clientId,
       is_visitor: isVisitor,
-      seller_id: user?.id ?? undefined,
+      seller_id: userId,
       payment_method: paymentMethod,
       items,
     });
@@ -50,7 +53,7 @@ export async function processSaleAction(
     await logAction({
       action_type: "SALE_CREATED",
       description: `Venta #${sale.id.toString().slice(-6).toUpperCase()} — S/ ${Number(sale.total).toFixed(2)} — ${paymentMethod} — ${itemNames}`,
-      user_id: user?.id,
+      user_id: userId,
       client_id: clientId.toString(),
     });
 
@@ -59,6 +62,19 @@ export async function processSaleAction(
     return { success: true, saleId: sale.id, total: sale.total };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Error inesperado al procesar la venta.";
+
+    try {
+      await logAction({
+        action_type: "SALE_CREATE_FAILED",
+        description: `Error al procesar venta para cliente ${clientId}: ${msg}`,
+        user_id: userId,
+        client_id: clientId.toString(),
+        is_error: true,
+      });
+    } catch {
+      // Avoid masking the original sale error if activity logging also fails.
+    }
+
     return { success: false, error: msg };
   }
 }

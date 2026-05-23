@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import Link from "next/link";
 import type { ClientWithMembership } from "@/lib/api/clients.api";
 import { addClientAction, editClientAction, removeClientAction } from "./actions";
 
@@ -412,17 +413,24 @@ export default function ClientsManager({
                         )}
                       </td>
                       <td className="py-4 px-6 text-right">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/pages/clients/${client.id}`}
+                            className="w-9 h-9 flex items-center justify-center bg-surface-container-high hover:bg-surface-container-highest rounded-full shadow-sm hover:scale-105 active:scale-95 transition-all text-secondary cursor-pointer border border-outline-variant/10"
+                            title="Ver Detalles"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">visibility</span>
+                          </Link>
                           <button
                             onClick={() => openEdit(client)}
-                            className="p-2 text-on-surface/60 hover:text-primary transition-colors cursor-pointer bg-surface-container-highest rounded-full shadow-sm"
+                            className="w-9 h-9 flex items-center justify-center bg-surface-container-high hover:bg-surface-container-highest rounded-full shadow-sm hover:scale-105 active:scale-95 transition-all text-primary cursor-pointer border border-outline-variant/10"
                             title="Editar"
                           >
                             <span className="material-symbols-outlined text-[18px]">edit</span>
                           </button>
                           <button
                             onClick={() => handleDelete(client.id)}
-                            className="p-2 text-on-surface/60 hover:text-error transition-colors cursor-pointer bg-surface-container-highest rounded-full shadow-sm"
+                            className="w-9 h-9 flex items-center justify-center bg-surface-container-high hover:bg-surface-container-highest rounded-full shadow-sm hover:scale-105 active:scale-95 transition-all text-error cursor-pointer border border-outline-variant/10"
                             title="Eliminar"
                           >
                             <span className="material-symbols-outlined text-[18px]">delete</span>

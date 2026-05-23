@@ -124,7 +124,7 @@ export async function createClient(
 /** Actualiza un cliente existente. */
 export async function updateClient(
   id: string,
-  input: Partial<Pick<Client, "first_name" | "last_name" | "email" | "dni" | "phone" | "status">>
+  input: Partial<Pick<Client, "first_name" | "last_name" | "email" | "dni" | "phone" | "status" | "notes">>
 ): Promise<Client> {
   const { data, error } = await supabase
     .from("clients")

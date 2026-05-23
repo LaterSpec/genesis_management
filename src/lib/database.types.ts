@@ -21,6 +21,7 @@ export interface Profile {
   birth_date?: string | null;
   registration_date?: string | null;
   gender?: string | null;
+  is_active: boolean;
   created_at: string; // TIMESTAMPTZ como ISO string
 }
 
@@ -33,6 +34,7 @@ export interface Client {
   phone: string | null;
   status: string; // 'active' | 'inactive'
   join_date: string;
+  notes?: string | null;
 }
 
 export interface MembershipPlan {

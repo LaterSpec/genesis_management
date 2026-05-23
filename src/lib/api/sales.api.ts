@@ -64,6 +64,30 @@ export async function getSalesHistory(limit = 50): Promise<SaleWithItems[]> {
   return (data ?? []) as SaleWithItems[];
 }
 
+/** Obtiene el historial de ventas de un cliente específico. */
+export async function getSalesByClientId(clientId: string, limit = 20): Promise<SaleWithItems[]> {
+  const { data, error } = await supabase
+    .from("sales")
+    .select(
+      `
+      *,
+      clients (id, first_name, last_name, email),
+      profiles (id, first_name, last_name),
+      sale_items (
+        *,
+        products (id, name, sku, price),
+        memberships (id, status)
+      )
+    `
+    )
+    .eq("client_id", clientId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw new Error(`[sales.api] getSalesByClientId: ${error.message}`);
+  return (data ?? []) as SaleWithItems[];
+}
+
 /** Obtiene el total de ventas del mes actual. */
 export async function getMonthlySalesTotal(): Promise<number> {
   const now = new Date();

@@ -55,7 +55,7 @@ export async function getStaffAction(): Promise<ActionResponse<StaffMember[]>> {
 }
 
 /**
- * Server Action para crear un nuevo usuario con rol de recepcionista.
+ * Server Action para crear un nuevo usuario con rol de recepcionista o administrador.
  */
 export async function createStaffAction(input: CreateStaffInput): Promise<ActionResponse<StaffMember>> {
   try {
@@ -70,7 +70,7 @@ export async function createStaffAction(input: CreateStaffInput): Promise<Action
     await logAction({
       user_id: adminUser.id,
       action_type: "STAFF_CREATED",
-      description: `Creó la cuenta de recepcionista para: ${input.first_name} ${input.last_name} (${input.email})`,
+      description: `Creó la cuenta de ${input.role === "administrator" ? "administrador" : "recepcionista"} para: ${input.first_name} ${input.last_name} (${input.email})`,
     });
 
     revalidateAll();
@@ -81,7 +81,7 @@ export async function createStaffAction(input: CreateStaffInput): Promise<Action
 }
 
 /**
- * Server Action para dar de baja (eliminar) una cuenta de personal.
+ * Server Action para dar de baja (desactivar) una cuenta de personal.
  */
 export async function deleteStaffAction(userId: string): Promise<ActionResponse<void>> {
   try {
@@ -96,7 +96,7 @@ export async function deleteStaffAction(userId: string): Promise<ActionResponse<
     await logAction({
       user_id: adminUser.id,
       action_type: "STAFF_DELETED",
-      description: `Dio de baja al personal con ID: ${userId}`,
+      description: `Dio de baja (desactivó) al personal con ID: ${userId}`,
     });
 
     revalidateAll();

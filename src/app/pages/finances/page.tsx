@@ -14,7 +14,7 @@ export default async function FinancesPage() {
     getTransactions({ limit: 10 }),
     getDailyFinancialData(7),
     getCashSessions(),
-    getStaffList(),
+    getStaffList({ includeInactive: true }),
   ]);
 
   return (

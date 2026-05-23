@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
-import TopAppBar from "./TopAppBar";
 import { useCashSession } from "./CashSessionContext";
 import { useEffect, useState } from "react";
 
@@ -55,7 +54,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <>
       <Sidebar />
       <main className="flex-1 md:ml-72 flex flex-col min-h-screen relative">
-        <TopAppBar />
         <div className="p-8 space-y-8 flex-1 overflow-x-hidden">
           {children}
         </div>

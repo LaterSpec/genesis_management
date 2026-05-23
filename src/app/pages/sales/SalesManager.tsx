@@ -313,101 +313,103 @@ export default function SalesManager({ products, plans, clients, visitorId }: Pr
             ))}
           </div>
 
-          {/* Product/Plan grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-            {/* Plans */}
-            {showPlans &&
-              plans.map((plan) => (
-                <button
-                  key={plan.id}
-                  onClick={() => addPlan(plan)}
-                  className="bg-gradient-to-br from-primary/5 to-primary-container/10 border border-primary/10 rounded-[2rem] p-6 flex flex-col gap-3 text-left hover:shadow-lg hover:-translate-y-0.5 transition-all group cursor-pointer"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <span
-                        className="material-symbols-outlined text-2xl text-primary"
-                        style={{ fontVariationSettings: "'FILL' 1" }}
-                      >
-                        {plan.duration_days <= 1 ? "door_open" : "card_membership"}
-                      </span>
-                    </div>
-                    <span className="text-[11px] font-bold uppercase tracking-widest text-primary bg-primary/10 px-2.5 py-1 rounded-full">
-                      {plan.duration_days === 1
-                        ? "1 día"
-                        : plan.duration_days >= 365
-                        ? "1 año"
-                        : `${plan.duration_days} días`}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-headline font-bold text-base text-on-surface">{plan.name}</h3>
-                    <p className="font-body text-xs text-on-surface/50 line-clamp-1">
-                      {plan.description ?? `Acceso por ${plan.duration_days} día(s)`}
-                    </p>
-                  </div>
-                  <span className="font-headline font-extrabold text-2xl text-on-surface">
-                    S/ {Number(plan.price).toFixed(2)}
-                  </span>
-                </button>
-              ))}
-
-            {/* Products */}
-            {(categoryFilter !== "Membresías") &&
-              visibleProducts.map((product) => {
-                const cartItem = cart.find(
-                  (i) => i.type === "product" && i.product_id === product.id
-                );
-                const inCart = cartItem?.quantity ?? 0;
-                const noStock = product.stock === 0;
-                const maxReached = inCart >= product.stock;
-                const isLow = product.stock <= 10 && product.stock > 0;
-
-                return (
+          {/* Product/Plan grid container */}
+          <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-[2.5rem] p-6 max-h-[600px] overflow-y-auto shadow-inner pr-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              {/* Plans */}
+              {showPlans &&
+                plans.map((plan) => (
                   <button
-                    key={product.id}
-                    onClick={() => !noStock && !maxReached && addProduct(product)}
-                    disabled={noStock || maxReached}
-                    className={`bg-surface-container-low border border-outline-variant/10 rounded-[2rem] p-5 flex flex-col gap-3 text-left transition-all group ${
-                      noStock || maxReached
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
-                    }`}
+                    key={plan.id}
+                    onClick={() => addPlan(plan)}
+                    className="bg-gradient-to-br from-primary/5 to-primary-container/10 border border-primary/10 rounded-[2rem] p-6 flex flex-col gap-3 text-left hover:shadow-lg hover:-translate-y-0.5 transition-all group cursor-pointer"
                   >
-                    <div className="w-full h-24 rounded-xl bg-surface-container flex items-center justify-center">
-                      <span className="material-symbols-outlined text-4xl text-on-surface/20">
-                        inventory_2
+                    <div className="flex items-center justify-between">
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                        <span
+                          className="material-symbols-outlined text-2xl text-primary"
+                          style={{ fontVariationSettings: "'FILL' 1" }}
+                        >
+                          {plan.duration_days <= 1 ? "door_open" : "card_membership"}
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-bold uppercase tracking-widest text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+                        {plan.duration_days === 1
+                          ? "1 día"
+                          : plan.duration_days >= 365
+                          ? "1 año"
+                          : `${plan.duration_days} días`}
                       </span>
                     </div>
                     <div>
-                      <h3 className="font-headline font-bold text-sm text-on-surface">{product.name}</h3>
-                      <span className="font-body text-[10px] font-semibold uppercase tracking-wide bg-surface-container px-2 py-0.5 rounded text-on-surface/50">
-                        {product.categories?.name ?? "—"}
-                      </span>
+                      <h3 className="font-headline font-bold text-base text-on-surface">{plan.name}</h3>
+                      <p className="font-body text-xs text-on-surface/50 line-clamp-1">
+                        {plan.description ?? `Acceso por ${plan.duration_days} día(s)`}
+                      </p>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-headline font-extrabold text-lg text-primary">
-                        S/ {product.price.toFixed(2)}
-                      </span>
-                      <div className="flex flex-col items-end">
-                        {isLow && (
-                          <span className="text-[10px] text-error font-semibold">
-                            Stock: {product.stock}
-                          </span>
-                        )}
-                        {inCart > 0 && (
-                          <span className="text-[10px] text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full">
-                            {inCart} en carrito
-                          </span>
-                        )}
-                        {noStock && (
-                          <span className="text-[10px] text-error font-semibold">Sin stock</span>
-                        )}
-                      </div>
-                    </div>
+                    <span className="font-headline font-extrabold text-2xl text-on-surface">
+                      S/ {Number(plan.price).toFixed(2)}
+                    </span>
                   </button>
-                );
-              })}
+                ))}
+
+              {/* Products */}
+              {(categoryFilter !== "Membresías") &&
+                visibleProducts.map((product) => {
+                  const cartItem = cart.find(
+                    (i) => i.type === "product" && i.product_id === product.id
+                  );
+                  const inCart = cartItem?.quantity ?? 0;
+                  const noStock = product.stock === 0;
+                  const maxReached = inCart >= product.stock;
+                  const isLow = product.stock <= 10 && product.stock > 0;
+
+                  return (
+                    <button
+                      key={product.id}
+                      onClick={() => !noStock && !maxReached && addProduct(product)}
+                      disabled={noStock || maxReached}
+                      className={`bg-surface-container-low border border-outline-variant/10 rounded-[2rem] p-5 flex flex-col gap-3 text-left transition-all group ${
+                        noStock || maxReached
+                          ? "opacity-50 cursor-not-allowed"
+                          : "hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
+                      }`}
+                    >
+                      <div className="w-full h-24 rounded-xl bg-surface-container flex items-center justify-center">
+                        <span className="material-symbols-outlined text-4xl text-on-surface/20">
+                          inventory_2
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="font-headline font-bold text-sm text-on-surface">{product.name}</h3>
+                        <span className="font-body text-[10px] font-semibold uppercase tracking-wide bg-surface-container px-2 py-0.5 rounded text-on-surface/50">
+                          {product.categories?.name ?? "—"}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-headline font-extrabold text-lg text-primary">
+                          S/ {product.price.toFixed(2)}
+                        </span>
+                        <div className="flex flex-col items-end">
+                          {isLow && (
+                            <span className="text-[10px] text-error font-semibold">
+                              Stock: {product.stock}
+                            </span>
+                          )}
+                          {inCart > 0 && (
+                            <span className="text-[10px] text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full">
+                              {inCart} en carrito
+                            </span>
+                          )}
+                          {noStock && (
+                            <span className="text-[10px] text-error font-semibold">Sin stock</span>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+            </div>
           </div>
         </div>
 

@@ -341,3 +341,28 @@ export async function deleteAttendance(input: {
     client_id: existing.client_id,
   });
 }
+
+/** Obtiene el historial de asistencias de un cliente específico. */
+export async function getAttendancesByClientId(clientId: string, limit = 20): Promise<ClientAttendanceFull[]> {
+  const { data, error } = await supabase
+    .from("client_attendances")
+    .select(
+      `
+      *,
+      clients (
+        id,
+        first_name,
+        last_name,
+        dni,
+        status
+      ),
+      profiles (id, first_name, last_name, role)
+    `
+    )
+    .eq("client_id", clientId)
+    .order("attendance_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw new Error(`[attendance.api] getAttendancesByClientId: ${error.message}`);
+  return (data ?? []) as ClientAttendanceFull[];
+}

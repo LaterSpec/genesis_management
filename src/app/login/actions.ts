@@ -42,6 +42,20 @@ export async function login(formData: FormData) {
     return redirect(`/login?message=${encodeURIComponent(error.message)}`);
   }
 
+  // Verificar si la cuenta de personal está activa
+  if (data?.user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_active")
+      .eq("id", data.user.id)
+      .single();
+
+    if (profile && !profile.is_active) {
+      await supabase.auth.signOut();
+      return redirect(`/login?message=${encodeURIComponent("Tu cuenta ha sido desactivada por el administrador.")}`);
+    }
+  }
+
   console.log("[LOGIN SUCCESS] user:", data.user?.email);
   revalidatePath("/", "layout");
   return redirect("/pages/dashboard");
